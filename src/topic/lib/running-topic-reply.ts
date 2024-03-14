@@ -1,5 +1,4 @@
 import {LegacyDetailMatch, NewDetailMatch} from "@topic/match";
-import TopicContext from "@topic/lib/hooks/topic-context";
 import {useContext} from "react";
 import {TopicDetail} from "@topic/lib/get-topic-detail";
 
@@ -196,8 +195,7 @@ const ActionButtonToSubmit = async () => {
   }
 }
 
-const StandBy = async (times: number = 1) => {
-  const {standbyTime} = useContext(TopicContext);
+const Standby = async (times: number = 1) => {
 
   return new Promise(resolve => setTimeout(resolve, standbyTime * times));
 }

@@ -1,24 +1,12 @@
 import {LegacyDetailMatch, NewDetailMatch} from "@topic/match";
-import {useContext} from "react";
-import TopicContext from "@topic/lib/hooks/topic-context";
+import {Reply, TopicDetail} from "@topic/lib/types";
+import {useLogStore} from "@topic/lib/store";
 
-import {addLogItem} from "@topic/lib/atom";
-
-interface Reply {
-  author?: string;
-  content?: string;
-}
-
-export interface TopicDetail {
-  title?: string;
-  content?: string;
-  replies?: Reply[];
-}
 
 export default function GetTopicDetail() {
-  // const addLogItem = useAddLogItem();
   const newDetailMatch = NewDetailMatch();
   const legacyDetailMatch = LegacyDetailMatch();
+  const addLogItem = useLogStore.getState().addLogItem;
 
   const detail: TopicDetail = {
     title: null,

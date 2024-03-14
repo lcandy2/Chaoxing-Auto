@@ -5,8 +5,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import {useEffect, useState} from "react";
 import {TabContext, TabList, TabPanel} from "@mui/lab";
 import useGMValue from "@topic/lib/hooks/use-gm-value";
-import IsPageDetail from "@topic/lib/detail-detect";
-import GetTopicDetail from "@topic/lib/get-topic-detail";
 import About from "@topic/lib/compoments/panel-about";
 import Settings from "@topic/lib/compoments/panel-settings";
 import Status from "@topic/lib/compoments/panel-status";

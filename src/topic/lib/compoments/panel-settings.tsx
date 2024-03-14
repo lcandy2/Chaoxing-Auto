@@ -1,7 +1,7 @@
 import {List, ListItem} from "@mui/material";
 import NumberInput from "@topic/lib/compoments/number-input";
 import {useAtom} from "jotai";
-import {countAtom, standbyTimeAtom} from "@topic/lib/atom";
+import {countAtom, standbyTimeAtom} from "@topic/lib/atoms";
 
 export default function Settings() {
   const [count, setCount] = useAtom(countAtom);

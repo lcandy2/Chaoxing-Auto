@@ -1,27 +1,40 @@
 import {Button, CircularProgress} from "@mui/material";
 import {useAtom} from "jotai";
-import IsPageDetail from "@topic/lib/detail-detect";
 import {useEffect} from "react";
 import GetTopicDetail from "@topic/lib/get-topic-detail";
-import {addLogItem, currentPageAtom, runningAtom, topicDetailAtom} from "@topic/lib/atom";
+import {currentPageAtom, runningAtom, topicDetailAtom, useAddLogItem} from "@topic/lib/atoms";
+import {DetailMatch, ListMatch} from "@topic/match";
+import {useLogStore} from "@topic/lib/store";
 
 export default function PanelActions() {
   const [running, setRunning] = useAtom(runningAtom);
   const [currentPage, setCurrentPage] = useAtom(currentPageAtom);
   const [topicDetail, setTopicDetail] = useAtom(topicDetailAtom);
+  const {addLogItem} = useLogStore()
 
   useEffect(() => {
-    if (IsPageDetail()) {
+    if (DetailMatch()) {
       setCurrentPage("detail");
-    } else {
+    } else if (ListMatch()) {
       setCurrentPage("list");
     }
+    console.log("1")
   }, []);
 
-
   useEffect(() => {
-    if (currentPage !== null) {
-      const page = currentPage === "detail" ? "讨论详情" : "讨论列表";
+    if (currentPage === "list" || currentPage === "detail") {
+      let page: string;
+      switch (currentPage) {
+        case "detail":
+          page = "讨论详情";
+          break;
+        case "list":
+          page = "讨论列表";
+          break;
+        default:
+          page = "未知页面";
+          break;
+      }
       addLogItem(`检测到当前为 [${page}]`);
 
       const topicDetail = GetTopicDetail();
