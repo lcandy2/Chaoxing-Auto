@@ -1,15 +1,13 @@
 import {Button, CircularProgress} from "@mui/material";
-import {useAtom} from "jotai";
 import {useEffect} from "react";
 import GetTopicDetail from "@topic/lib/get-topic-detail";
-import {currentPageAtom, runningAtom, topicDetailAtom, useAddLogItem} from "@topic/lib/atoms";
 import {DetailMatch, ListMatch} from "@topic/match";
-import {useLogStore} from "@topic/lib/store";
+import {useLogStore, useStatusStore} from "@topic/lib/store";
 
 export default function PanelActions() {
-  const [running, setRunning] = useAtom(runningAtom);
-  const [currentPage, setCurrentPage] = useAtom(currentPageAtom);
-  const [topicDetail, setTopicDetail] = useAtom(topicDetailAtom);
+  const {running, setRunning} = useStatusStore()
+  const {currentPage, setCurrentPage} = useStatusStore()
+  const {topicDetail, setTopicDetail} = useStatusStore()
   const {addLogItem} = useLogStore()
 
   useEffect(() => {

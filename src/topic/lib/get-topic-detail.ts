@@ -2,7 +2,6 @@ import {LegacyDetailMatch, NewDetailMatch} from "@topic/match";
 import {Reply, TopicDetail} from "@topic/lib/types";
 import {useLogStore} from "@topic/lib/store";
 
-
 export default function GetTopicDetail() {
   const newDetailMatch = NewDetailMatch();
   const legacyDetailMatch = LegacyDetailMatch();

@@ -1,4 +1,4 @@
-export type CurrentPageType = "list" | "detail" | false;
+export type CurrentPage = "list" | "detail" | false;
 
 export interface Reply {
   author?: string;

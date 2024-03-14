@@ -1,18 +1,14 @@
 import {List, ListItem} from "@mui/material";
 import NumberInput from "@topic/lib/compoments/number-input";
-import {useAtom} from "jotai";
-import {countAtom, standbyTimeAtom} from "@topic/lib/atoms";
+import {useSettingsStore} from "@topic/lib/store";
 
 export default function Settings() {
-  const [count, setCount] = useAtom(countAtom);
-  const [standbyTime, setStandbyTime] = useAtom(standbyTimeAtom);
+  const {countTimes, standbyTime, setCountTimes, setStandbyTime} = useSettingsStore();
+  const hasHydrated = useSettingsStore(state => state._hasHydrated);
 
-  // useEffect(() => {
-  //   GM_setValue("topic_replyCountTimes", count);
-  // }, [count]);
-  // useEffect(() => {
-  //   GM_setValue("topic_replyStandbyTime", standbyTime);
-  // }, [standbyTime]);
+  if (!hasHydrated) {
+    return <p>Loading...</p>
+  }
 
   return <List
       sx={{}}
@@ -22,8 +18,8 @@ export default function Settings() {
           label="评论数量"
           min={1}
           max={10}
-          initialValue={count}
-          onChange={setCount}
+          initialValue={countTimes}
+          onChange={setCountTimes}
           size="small"
           style={{width: 130}}
       />

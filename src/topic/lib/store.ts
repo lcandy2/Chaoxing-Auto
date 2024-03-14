@@ -1,5 +1,7 @@
 import {create} from "zustand";
-import {combine} from "zustand/middleware";
+import {combine, createJSONStorage, persist} from "zustand/middleware";
+import GMStorage from "@topic/lib/hooks/gm-storage";
+import {CurrentPage, TopicDetail} from "@topic/lib/types";
 
 export const useLogStore = create(combine(
     {
@@ -7,6 +9,50 @@ export const useLogStore = create(combine(
     }, (set) => ({
       addLogItem: (item: string) => {
         set((state) => ({logItems: [...state.logItems, item]}));
+      }
+    })
+));
+
+export const useSettingsStore = create(persist(combine(
+    {
+      standbyTime: <number>200,
+      countTimes: <number>1,
+      _hasHydrated: <boolean>false,
+    }, (set) => ({
+      setStandbyTime: (time: number) => {
+        set({standbyTime: time});
+      },
+      setCountTimes: (times: number) => {
+        set({countTimes: times});
+      },
+      setHasHydrated: (state) => {
+        set({
+          _hasHydrated: state
+        });
+      }
+    })
+), {
+  name: "topic_settings",
+  storage: createJSONStorage(() => GMStorage),
+  onRehydrateStorage: () => (state) => {
+    state.setHasHydrated(true)
+  }
+}));
+
+export const useStatusStore = create(combine(
+    {
+      running: <boolean>false,
+      currentPage: <CurrentPage>false,
+      topicDetail: <TopicDetail>{},
+    }, (set) => ({
+      setRunning: (running: boolean) => {
+        set({running});
+      },
+      setCurrentPage: (currentPage: CurrentPage) => {
+        set({currentPage});
+      },
+      setTopicDetail: (topicDetail: TopicDetail) => {
+        set({topicDetail});
       }
     })
 ));

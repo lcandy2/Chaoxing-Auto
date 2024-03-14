@@ -14,7 +14,6 @@
     "@mui/icons-material": "^5.15.12",
     "@mui/lab": "5.0.0-alpha.167",
     "@mui/material": "^5.15.12",
-    "jotai": "^2.7.0",
     "preact": "10.19.3",
     "react-draggable": "^4.4.6",
     "zustand": "^4.5.2"

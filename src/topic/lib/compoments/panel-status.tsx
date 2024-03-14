@@ -1,6 +1,4 @@
 import {List, ListItem, ListItemText} from "@mui/material";
-import {Provider, useAtom} from "jotai";
-import {logItemsAtom, topicStore} from "@topic/lib/atoms";
 import {useLogStore} from "@topic/lib/store";
 
 // const LogList = ({param: {logItems}}) => {
