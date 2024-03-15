@@ -1,21 +1,21 @@
-import {Button, CircularProgress, Icon, Typography} from "@mui/material";
-import {useEffect, useState} from "react";
+import { Button, CircularProgress, Icon, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import GetTopicDetail from "@topic/lib/get-topic-detail";
-import {DetailMatch, ListMatch} from "@topic/match";
-import {useLogStore, useStatusStore} from "@topic/lib/store";
+import { DetailMatch, ListMatch } from "@topic/match";
+import { useLogStore, useStatusStore } from "@topic/lib/store";
 import RunningTopicDetailReply from "@topic/lib/running-topic-detail-reply";
-import {GetHashAction, GetHashStart, GetHashSuccess} from "@topic/lib/hash";
+import { GetHashAction, GetHashStart, GetHashSuccess } from "@topic/lib/hash";
 import GetTopicList from "@topic/lib/get-topic-list";
 
 export default function PanelActions() {
-  const {currentPage, setCurrentPage} = useStatusStore()
-  const {topicDetail, setTopicDetail} = useStatusStore()
-  const {topicList, setTopicList} = useStatusStore()
-  const {currentStatus, setCurrentStatus} = useStatusStore()
-  const {isInActionFrame, setIsInActionFrame} = useStatusStore()
-  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false)
-  const {addLogItem} = useLogStore()
-  const [runningListIndex, setRunningListIndex] = useState<number | null>(null)
+  const { currentPage, setCurrentPage } = useStatusStore();
+  const { topicDetail, setTopicDetail } = useStatusStore();
+  const { topicList, setTopicList } = useStatusStore();
+  const { currentStatus, setCurrentStatus } = useStatusStore();
+  const { isInActionFrame, setIsInActionFrame } = useStatusStore();
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+  const { addLogItem } = useLogStore();
+  const [runningListIndex, setRunningListIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const hashSuccess = GetHashSuccess();
@@ -61,7 +61,6 @@ export default function PanelActions() {
           break;
       }
       addLogItem(`检测到当前为 [${page}]`);
-
     }
   }, [currentPage]);
 
@@ -93,7 +92,7 @@ export default function PanelActions() {
       } else {
         setCurrentStatus("failed");
       }
-    }
+    };
 
     switch (currentStatus) {
       case "running":
@@ -112,18 +111,39 @@ export default function PanelActions() {
 
   const handleRunningButtonClick = async () => {
     setCurrentStatus("triggered");
-  }
+  };
 
   return (
-      <>
-        {isButtonDisabled && <CircularProgress size="2em"/>}
-        {currentStatus === "success" && <><Icon color="success">done</Icon><Typography
-            variant="body2">已完成</Typography></>}
-        {currentStatus === "failed" && <><Icon color="error">error</Icon><Typography
-            variant="body2">错误</Typography></>}
-        {(currentPage === "detail" && !isInActionFrame) &&
-            <Button autoFocus={currentStatus !== "success"} disabled={isButtonDisabled}
-                    onClick={handleRunningButtonClick}>{(currentStatus === "success" || currentStatus === "failed") && "再次"}回复讨论</Button>}
-        {currentPage === "list" && <Button autoFocus disabled>暂不支持</Button>}
-      </>)
+    <>
+      {isButtonDisabled && <CircularProgress size="2em" />}
+      {currentStatus === "success" && (
+        <>
+          <Icon color="success">done</Icon>
+          <Typography variant="body2">已完成</Typography>
+        </>
+      )}
+      {currentStatus === "failed" && (
+        <>
+          <Icon color="error">error</Icon>
+          <Typography variant="body2">错误</Typography>
+        </>
+      )}
+      {currentPage === "detail" && !isInActionFrame && (
+        <Button
+          autoFocus={currentStatus !== "success"}
+          disabled={isButtonDisabled}
+          onClick={handleRunningButtonClick}
+        >
+          {(currentStatus === "success" || currentStatus === "failed") &&
+            "再次"}
+          回复讨论
+        </Button>
+      )}
+      {currentPage === "list" && (
+        <Button autoFocus disabled>
+          暂不支持
+        </Button>
+      )}
+    </>
+  );
 }

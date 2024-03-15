@@ -1,7 +1,7 @@
-import {defineConfig} from 'vite';
-import react from '@vitejs/plugin-react';
-import monkey, {cdn} from 'vite-plugin-monkey';
-import {resolve} from 'path'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import monkey, { cdn } from "vite-plugin-monkey";
+import { resolve } from "path";
 import * as TopicConfig from "./src/topic/config";
 
 const matchUrl = (url: URL) => `${url.toString()}*`;
@@ -11,9 +11,9 @@ export default defineConfig({
   plugins: [
     react(),
     monkey({
-      entry: 'src/main.tsx',
+      entry: "src/main.tsx",
       userscript: {
-        namespace: 'lcandy2/chaoxing-auto',
+        namespace: "lcandy2/chaoxing-auto",
         match: [
           // Topic
           matchUrl(TopicConfig.LEGACY_LIST), // Legacy List
@@ -26,15 +26,27 @@ export default defineConfig({
       },
       build: {
         externalGlobals: {
-          react: cdn.npmmirror('React', 'umd/react.production.min.js'),
-          'react-dom': cdn.npmmirror(
-              'ReactDOM',
-              'umd/react-dom.production.min.js',
+          react: cdn.npmmirror("React", "umd/react.production.min.js"),
+          "react-dom": cdn.npmmirror(
+            "ReactDOM",
+            "umd/react-dom.production.min.js",
           ),
-          "react-draggable": cdn.npmmirror('ReactDraggable', 'build/web/react-draggable.min.js'),
-          "@emotion/react": cdn.npmmirror('emotionReact', 'dist/emotion-react.umd.min.js'),
-          "@emotion/styled": cdn.npmmirror('emotionStyled', 'dist/emotion-styled.umd.min.js'),
-          "@mui/material": cdn.npmmirror('MaterialUI', 'umd/material-ui.production.min.js'),
+          "react-draggable": cdn.npmmirror(
+            "ReactDraggable",
+            "build/web/react-draggable.min.js",
+          ),
+          "@emotion/react": cdn.npmmirror(
+            "emotionReact",
+            "dist/emotion-react.umd.min.js",
+          ),
+          "@emotion/styled": cdn.npmmirror(
+            "emotionStyled",
+            "dist/emotion-styled.umd.min.js",
+          ),
+          "@mui/material": cdn.npmmirror(
+            "MaterialUI",
+            "umd/material-ui.production.min.js",
+          ),
         },
       },
     }),
@@ -43,23 +55,23 @@ export default defineConfig({
     alias: [
       {
         find: "@",
-        replacement: resolve(__dirname, './src')
+        replacement: resolve(__dirname, "./src"),
       },
       {
         find: "@topic",
-        replacement: resolve(__dirname, './src/topic')
-      }
-    ]
+        replacement: resolve(__dirname, "./src/topic"),
+      },
+    ],
   },
   build: {
-    minify: 'terser',
+    minify: "terser",
     terserOptions: {
       compress: true, // 禁用压缩
       mangle: true, // 启用变量名和函数名混淆
       format: {
         beautify: true, // 保持代码格式化
-        comments: false // 删除所有注释
-      }
+        comments: false, // 删除所有注释
+      },
     },
   },
 });

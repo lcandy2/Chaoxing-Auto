@@ -1,5 +1,5 @@
 import TopicMain from "@topic/main";
-import {Match as TopicMatch} from "@topic/match";
+import { Match as TopicMatch } from "@topic/match";
 
 console.log("Chaoxing auto start!!!");
 

@@ -3,13 +3,14 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText, DialogProps,
+  DialogContentText,
+  DialogProps,
   DialogTitle,
   Icon,
-  IconButton
+  IconButton,
 } from "@mui/material";
-import Draggable, {DraggableProps} from "react-draggable";
-import React, {useState} from "react";
+import Draggable, { DraggableProps } from "react-draggable";
+import React, { useState } from "react";
 
 interface DraggableFloatingDialogProps {
   title: string;
@@ -22,15 +23,15 @@ interface DraggableFloatingDialogProps {
 }
 
 export default function DraggableFloatingDialog({
-                                                  title,
-                                                  canBeClosed = true,
-                                                  handleClose,
-                                                  actions,
-                                                  draggableProps,
-                                                  dialogProps,
-                                                  maxWidth,
-                                                  children
-                                                }: DraggableFloatingDialogProps & { children?: React.ReactNode }) {
+  title,
+  canBeClosed = true,
+  handleClose,
+  actions,
+  draggableProps,
+  dialogProps,
+  maxWidth,
+  children,
+}: DraggableFloatingDialogProps & { children?: React.ReactNode }) {
   const [open, setOpen] = useState(true);
   const nodeRef = React.useRef(null);
 
@@ -39,60 +40,58 @@ export default function DraggableFloatingDialog({
     if (handleClose) {
       handleClose();
     }
-  }
+  };
 
   return (
-      open && (<Draggable
-          handle="#draggable-dialog-title"
-          cancel={'[class*="MuiDialogContent-root"]'}
-          nodeRef={nodeRef}
-          {...draggableProps}
+    open && (
+      <Draggable
+        handle="#draggable-dialog-title"
+        cancel={'[class*="MuiDialogContent-root"]'}
+        nodeRef={nodeRef}
+        {...draggableProps}
       >
-        <div
-            className={"floating-overlay"}
-            ref={nodeRef}>
+        <div className={"floating-overlay"} ref={nodeRef}>
           <Dialog
-              open={true}
-              hideBackdrop
-              disableEnforceFocus
-              disableAutoFocus
-              disableScrollLock
-              disablePortal
-              maxWidth={maxWidth || "xs"}
-              aria-labelledby="draggable-dialog-title"
-              container={() => document.querySelector('.floating-overlay') as HTMLElement}
-              {...dialogProps}
+            open={true}
+            hideBackdrop
+            disableEnforceFocus
+            disableAutoFocus
+            disableScrollLock
+            disablePortal
+            maxWidth={maxWidth || "xs"}
+            aria-labelledby="draggable-dialog-title"
+            container={() =>
+              document.querySelector(".floating-overlay") as HTMLElement
+            }
+            {...dialogProps}
           >
-            <DialogTitle style={{cursor: 'move'}} id="draggable-dialog-title">
+            <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
               {title}
             </DialogTitle>
 
             {canBeClosed && (
-                <IconButton
-                    aria-label="close"
-                    onClick={handleDialogClose}
-                    sx={{
-                      position: 'absolute',
-                      right: 8,
-                      top: 8,
-                      color: (theme) => theme.palette.grey[500],
-                    }}
-                >
-                  <Icon>close</Icon>
-                </IconButton>
+              <IconButton
+                aria-label="close"
+                onClick={handleDialogClose}
+                sx={{
+                  position: "absolute",
+                  right: 8,
+                  top: 8,
+                  color: (theme) => theme.palette.grey[500],
+                }}
+              >
+                <Icon>close</Icon>
+              </IconButton>
             )}
-            <DialogContent dividers sx={{p: 0}}>
-              <DialogContentText component={'div'}>
+            <DialogContent dividers sx={{ p: 0 }}>
+              <DialogContentText component={"div"}>
                 {children}
               </DialogContentText>
             </DialogContent>
-            {actions && (
-                <DialogActions>
-                  {actions}
-                </DialogActions>
-            )}
+            {actions && <DialogActions>{actions}</DialogActions>}
           </Dialog>
         </div>
-      </Draggable>)
-  )
+      </Draggable>
+    )
+  );
 }

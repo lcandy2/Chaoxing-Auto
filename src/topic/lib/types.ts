@@ -2,7 +2,13 @@ export type CurrentPage = "list" | "detail" | null;
 
 export type CurrentVersion = "new" | "legacy" | null;
 
-export type CurrentStatus = "idle" | "triggered" | "running" | "failed" | "success" | null;
+export type CurrentStatus =
+  | "idle"
+  | "triggered"
+  | "running"
+  | "failed"
+  | "success"
+  | null;
 
 export type CurrentTab = "status" | "settings" | "about";
 

@@ -1,49 +1,59 @@
-import {LegacyDetailMatch, NewDetailMatch} from "@topic/match";
-import {useLogStore, useSettingsStore, useStatusStore} from "@topic/lib/store";
+import { LegacyDetailMatch, NewDetailMatch } from "@topic/match";
+import {
+  useLogStore,
+  useSettingsStore,
+  useStatusStore,
+} from "@topic/lib/store";
 import Standby from "@topic/lib/standby";
-import {CurrentVersion, TopicDetail} from "@topic/lib/types";
+import { CurrentVersion, TopicDetail } from "@topic/lib/types";
 import {
   LEGACY_DETAIL_ACTION_BUTTON_TO_REPLY,
   LEGACY_DETAIL_ACTION_BUTTON_TO_SUBMIT,
   LEGACY_DETAIL_ACTION_TEXTAREA,
   NEW_DETAIL_ACTION_BUTTON_TO_REPLY,
   NEW_DETAIL_ACTION_BUTTON_TO_SUBMIT,
-  NEW_DETAIL_ACTION_TEXTAREA
+  NEW_DETAIL_ACTION_TEXTAREA,
 } from "@topic/config";
 import MakeError from "@topic/lib/make-error";
-import {AppendHashSuccess} from "@topic/lib/hash";
+import { AppendHashSuccess } from "@topic/lib/hash";
 
 const currentVersion: CurrentVersion = (() => {
-  if (NewDetailMatch() && !LegacyDetailMatch()) return 'new';
-  if (LegacyDetailMatch() && !NewDetailMatch()) return 'legacy';
+  if (NewDetailMatch() && !LegacyDetailMatch()) return "new";
+  if (LegacyDetailMatch() && !NewDetailMatch()) return "legacy";
   return null;
 })();
 
-const isNewVersion = currentVersion === 'new';
+const isNewVersion = currentVersion === "new";
 
 const addLogItem = useLogStore.getState().addLogItem;
 
 export default async function RunningTopicDetailReply() {
-  const {countTimes} = useSettingsStore.getState();
-  const {topicDetail} = useStatusStore.getState();
+  const { countTimes } = useSettingsStore.getState();
+  const { topicDetail } = useStatusStore.getState();
   const contextToReply = getRandomReplies(topicDetail, countTimes);
   console.debug("currentVersion", currentVersion);
 
   try {
     if (contextToReply.length <= 0) {
-      throw new Error('未获取到回复评论。');
+      throw new Error("未获取到回复评论。");
     }
 
-    const buttonToReply = isNewVersion ? NEW_DETAIL_ACTION_BUTTON_TO_REPLY : LEGACY_DETAIL_ACTION_BUTTON_TO_REPLY;
-    const textAreaToReply = isNewVersion ? NEW_DETAIL_ACTION_TEXTAREA : LEGACY_DETAIL_ACTION_TEXTAREA;
-    const buttonToSubmit = isNewVersion ? NEW_DETAIL_ACTION_BUTTON_TO_SUBMIT : LEGACY_DETAIL_ACTION_BUTTON_TO_SUBMIT
+    const buttonToReply = isNewVersion
+      ? NEW_DETAIL_ACTION_BUTTON_TO_REPLY
+      : LEGACY_DETAIL_ACTION_BUTTON_TO_REPLY;
+    const textAreaToReply = isNewVersion
+      ? NEW_DETAIL_ACTION_TEXTAREA
+      : LEGACY_DETAIL_ACTION_TEXTAREA;
+    const buttonToSubmit = isNewVersion
+      ? NEW_DETAIL_ACTION_BUTTON_TO_SUBMIT
+      : LEGACY_DETAIL_ACTION_BUTTON_TO_SUBMIT;
 
     const actionButtonToReply = await ActionButtonToReply(buttonToReply);
     const actionTextAreaToReply = await ActionTextAreaToReply(textAreaToReply);
     const actionButtonToSubmit = await ActionButtonToSubmit({
       selector: buttonToSubmit,
       textarea: actionTextAreaToReply,
-      contextToReply
+      contextToReply,
     });
 
     if (actionButtonToReply && actionTextAreaToReply && actionButtonToSubmit) {
@@ -56,17 +66,20 @@ export default async function RunningTopicDetailReply() {
   }
 }
 
-const getRandomReplies = (topicDetail: TopicDetail, count: number): string[] => {
+const getRandomReplies = (
+  topicDetail: TopicDetail,
+  count: number,
+): string[] => {
   if (!topicDetail.replies) {
-    throw new Error('topicDetail.replies is undefined');
+    throw new Error("topicDetail.replies is undefined");
   }
 
-  const contents = topicDetail.replies.map(reply => reply.content || '');
+  const contents = topicDetail.replies.map((reply) => reply.content || "");
   const randomContents: string[] = [];
 
   if (contents.length <= count) {
     for (let i = 0; i < count; i++) {
-      randomContents.push(topicDetail.content || topicDetail.title || '');
+      randomContents.push(topicDetail.content || topicDetail.title || "");
     }
     return randomContents;
   }
@@ -86,14 +99,14 @@ const getRandomReplies = (topicDetail: TopicDetail, count: number): string[] => 
   }
 
   return randomContents;
-}
+};
 
 const ActionButtonToReply = async (selector: string) => {
   try {
     const element = document.querySelector(selector) as HTMLElement;
-    console.log(element, selector)
+    console.log(element, selector);
 
-    if (!element) throw new Error('无法找到进行回复的按钮。');
+    if (!element) throw new Error("无法找到进行回复的按钮。");
 
     element.click();
     addLogItem(`已点击进行回复的按钮，即将继续...`);
@@ -104,13 +117,13 @@ const ActionButtonToReply = async (selector: string) => {
     MakeError(error);
     return false;
   }
-}
+};
 
 const ActionTextAreaToReply = async (selector: string) => {
   try {
     const element = document.querySelector(selector) as HTMLInputElement;
 
-    if (!element) throw new Error('无法找到用于回复的文本区域。');
+    if (!element) throw new Error("无法找到用于回复的文本区域。");
 
     element.click();
     element.focus();
@@ -121,24 +134,28 @@ const ActionTextAreaToReply = async (selector: string) => {
   } catch (error) {
     MakeError(error);
   }
-}
+};
 
-const ActionButtonToSubmit = async ({selector, textarea, contextToReply}: {
-  selector: string,
-  textarea: HTMLInputElement | undefined,
-  contextToReply: string[]
+const ActionButtonToSubmit = async ({
+  selector,
+  textarea,
+  contextToReply,
+}: {
+  selector: string;
+  textarea: HTMLInputElement | undefined;
+  contextToReply: string[];
 }) => {
   try {
     const element = document.querySelector(selector) as HTMLElement;
 
-    if (!element || !textarea) throw new Error('Required elements not found.');
+    if (!element || !textarea) throw new Error("Required elements not found.");
 
     for (let i = 0; i < contextToReply.length; i++) {
       textarea.value = contextToReply[i];
       addLogItem(`Reply ${contextToReply[i]} filled, waiting to submit...`);
       if (currentVersion === "legacy") {
         AppendHashSuccess();
-        element.addEventListener('click', function (event) {
+        element.addEventListener("click", function (event) {
           event.preventDefault();
         });
       }
@@ -156,4 +173,4 @@ const ActionButtonToSubmit = async ({selector, textarea, contextToReply}: {
   } catch (error) {
     MakeError(error);
   }
-}
+};
