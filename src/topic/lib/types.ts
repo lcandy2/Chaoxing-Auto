@@ -20,6 +20,6 @@ export interface TopicDetail {
 export interface TopicList {
   title?: string;
   author?: string;
-  replyCount?: number;
+  replyCount?: string;
   url?: string;
 }

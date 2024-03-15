@@ -3,10 +3,14 @@ import {useLogStore, useSettingsStore, useStatusStore} from "@topic/lib/store";
 import Standby from "@topic/lib/standby";
 import {CurrentVersion, TopicDetail} from "@topic/lib/types";
 import {
-  LEGACY_DETAIL_ACTION_BUTTON_TO_REPLY, LEGACY_DETAIL_ACTION_BUTTON_TO_SUBMIT,
+  LEGACY_DETAIL_ACTION_BUTTON_TO_REPLY,
+  LEGACY_DETAIL_ACTION_BUTTON_TO_SUBMIT,
   LEGACY_DETAIL_ACTION_TEXTAREA,
-  NEW_DETAIL_ACTION_BUTTON_TO_REPLY, NEW_DETAIL_ACTION_BUTTON_TO_SUBMIT, NEW_DETAIL_ACTION_TEXTAREA
+  NEW_DETAIL_ACTION_BUTTON_TO_REPLY,
+  NEW_DETAIL_ACTION_BUTTON_TO_SUBMIT,
+  NEW_DETAIL_ACTION_TEXTAREA
 } from "@topic/config";
+import MakeError from "@topic/lib/make-error";
 
 const currentVersion: CurrentVersion = (() => {
   if (NewDetailMatch() && !LegacyDetailMatch()) return 'new';
@@ -18,17 +22,9 @@ const isNewVersion = currentVersion === 'new';
 
 const addLogItem = useLogStore.getState().addLogItem;
 
-const makeError = (message: any) => {
-  let version;
-  addLogItem(`----- 执行失败 -----`);
-  addLogItem(message.toString());
-  addLogItem(`-v=${currentVersion}`);
-  console.error(message, currentVersion);
-}
-
 export default async function RunningTopicReply() {
   const {countTimes} = useSettingsStore.getState();
-  const {topicDetail, setRunning} = useStatusStore.getState();
+  const {topicDetail} = useStatusStore.getState();
   const contextToReply = getRandomReplies(topicDetail, countTimes);
   console.debug("currentVersion", currentVersion);
 
@@ -54,7 +50,7 @@ export default async function RunningTopicReply() {
       return true;
     }
   } catch (error) {
-    makeError(error);
+    MakeError(error);
     return false;
   }
 }
@@ -104,7 +100,7 @@ const ActionButtonToReply = async (selector: string) => {
 
     return true;
   } catch (error) {
-    makeError(error);
+    MakeError(error);
     return false;
   }
 }
@@ -122,7 +118,7 @@ const ActionTextAreaToReply = async (selector: string) => {
 
     return element;
   } catch (error) {
-    makeError(error);
+    MakeError(error);
   }
 }
 
@@ -157,6 +153,6 @@ const ActionButtonToSubmit = async ({selector, textarea, contextToReply}: {
     addLogItem(`All Done!`);
     return true;
   } catch (error) {
-    makeError(error);
+    MakeError(error);
   }
 }

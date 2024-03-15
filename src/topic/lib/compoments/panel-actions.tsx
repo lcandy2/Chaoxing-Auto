@@ -1,17 +1,16 @@
-import {Button, CircularProgress, Icon} from "@mui/material";
+import {Button, CircularProgress, Icon, Typography} from "@mui/material";
 import {useEffect, useState} from "react";
 import GetTopicDetail from "@topic/lib/get-topic-detail";
 import {DetailMatch, ListMatch} from "@topic/match";
 import {useLogStore, useStatusStore} from "@topic/lib/store";
 import RunningTopicReply from "@topic/lib/running-topic-reply";
-// import CheckIcon from '@mui/icons-material/Check';
-// import ErrorIcon from '@mui/icons-material/Error';
 import {HashStart, HashSuccess} from "@topic/lib/get-hash";
+import GetTopicList from "@topic/lib/get-topic-list";
 
 export default function PanelActions() {
-  const {running, setRunning} = useStatusStore()
   const {currentPage, setCurrentPage} = useStatusStore()
   const {topicDetail, setTopicDetail} = useStatusStore()
+  const {topicList, setTopicList} = useStatusStore()
   const {currentStatus, setCurrentStatus} = useStatusStore()
   const [isButtonDisabled, setIsButtonDisabled] = useState(false)
   const {addLogItem} = useLogStore()
@@ -37,9 +36,17 @@ export default function PanelActions() {
       switch (currentPage) {
         case "detail":
           page = "讨论详情";
+          const topicDetail = GetTopicDetail();
+          if (topicDetail) {
+            setTopicDetail(topicDetail);
+          }
           break;
         case "list":
           page = "讨论列表";
+          const topicList = GetTopicList();
+            if (topicList) {
+                setTopicList(topicList);
+            }
           break;
         default:
           page = "未知页面";
@@ -47,10 +54,6 @@ export default function PanelActions() {
       }
       addLogItem(`检测到当前为 [${page}]`);
 
-      const topicDetail = GetTopicDetail();
-      if (topicDetail) {
-        setTopicDetail(topicDetail);
-      }
     }
   }, [currentPage]);
 
@@ -67,6 +70,12 @@ export default function PanelActions() {
       }
     }
   }, [topicDetail]);
+
+  useEffect(() => {
+    if (topicList.length) {
+        addLogItem(`获取到发起的讨论：共 ${topicList.length} 条`);
+    }
+  }, [topicList]);
 
   useEffect(() => {
     const handleRunningTopicReply = async () => {
@@ -100,9 +109,9 @@ export default function PanelActions() {
   return (
       <>
         {isButtonDisabled && <CircularProgress size="2em"/>}
-        {currentStatus === "success" && <Icon color="success">done</Icon>}
-        {currentStatus === "failed" && <Icon color="error">error</Icon>}
-        {currentPage === "detail" && <Button autoFocus disabled={isButtonDisabled} onClick={handleRunningButtonClick}>回复讨论</Button>}
-        {currentPage === "list" && <Button disabled>暂不支持</Button>}
+        {currentStatus === "success" && <><Icon color="success">done</Icon><Typography variant="body2">已完成</Typography></>}
+        {currentStatus === "failed" && <><Icon color="error">error</Icon><Typography variant="body2">错误</Typography></>}
+        {currentPage === "detail" && <Button autoFocus={currentStatus !== "success"} disabled={isButtonDisabled} onClick={handleRunningButtonClick}>{(currentStatus === "success" || currentStatus === "failed") && "再次"}回复讨论</Button>}
+        {currentPage === "list" && <Button autoFocus disabled>暂不支持</Button>}
       </>)
 }
