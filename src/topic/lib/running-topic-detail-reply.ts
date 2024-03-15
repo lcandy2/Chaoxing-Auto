@@ -11,6 +11,7 @@ import {
   NEW_DETAIL_ACTION_TEXTAREA
 } from "@topic/config";
 import MakeError from "@topic/lib/make-error";
+import {AppendHashSuccess} from "@topic/lib/hash";
 
 const currentVersion: CurrentVersion = (() => {
   if (NewDetailMatch() && !LegacyDetailMatch()) return 'new';
@@ -22,7 +23,7 @@ const isNewVersion = currentVersion === 'new';
 
 const addLogItem = useLogStore.getState().addLogItem;
 
-export default async function RunningTopicReply() {
+export default async function RunningTopicDetailReply() {
   const {countTimes} = useSettingsStore.getState();
   const {topicDetail} = useStatusStore.getState();
   const contextToReply = getRandomReplies(topicDetail, countTimes);
@@ -46,7 +47,7 @@ export default async function RunningTopicReply() {
     });
 
     if (actionButtonToReply && actionTextAreaToReply && actionButtonToSubmit) {
-      window.history.replaceState(null, "", "#cxauto_success");
+      AppendHashSuccess();
       return true;
     }
   } catch (error) {
@@ -136,7 +137,7 @@ const ActionButtonToSubmit = async ({selector, textarea, contextToReply}: {
       textarea.value = contextToReply[i];
       addLogItem(`Reply ${contextToReply[i]} filled, waiting to submit...`);
       if (currentVersion === "legacy") {
-        window.history.replaceState(null, "", "#cxauto_success");
+        AppendHashSuccess();
         element.addEventListener('click', function (event) {
           event.preventDefault();
         });

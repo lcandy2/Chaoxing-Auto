@@ -45,6 +45,8 @@ export const useStatusStore = create(combine(
     {
       currentStatus: <CurrentStatus>null,
       currentPage: <CurrentPage>null,
+      isInActionFrame: <boolean>false,
+      actionSrc: <string>"",
       topicDetail: <TopicDetail>{},
       topicList: <TopicList[]>[],
     }, (set) => ({
@@ -53,6 +55,12 @@ export const useStatusStore = create(combine(
       },
       setCurrentPage: (currentPage: CurrentPage) => {
         set({currentPage});
+      },
+      setIsInActionFrame: (isInActionFrame: boolean) => {
+        set({isInActionFrame});
+      },
+      setActionSrc: (actionSrc: string) => {
+        set({actionSrc});
       },
       setTopicDetail: (topicDetail: TopicDetail) => {
         set({topicDetail});

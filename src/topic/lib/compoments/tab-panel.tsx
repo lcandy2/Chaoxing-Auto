@@ -6,6 +6,7 @@ import React, {useState} from "react";
 import Status from "@topic/lib/compoments/panel-status";
 import Settings from "@topic/lib/compoments/panel-settings";
 import About from "@topic/lib/compoments/panel-about";
+import {useStatusStore} from "@topic/lib/store";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -49,6 +50,7 @@ function a11yProps(index: number) {
 
 export default function TabPanel() {
   const [tab, setTab] = useState(0);
+  const {isInActionFrame} = useStatusStore()
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
@@ -58,9 +60,9 @@ export default function TabPanel() {
       <Box sx={{ width: '100%' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={tab} onChange={handleChange} aria-label="basic tabs example">
-            <Tab label="状态" {...a11yProps(0)} />
-            <Tab label="设定" {...a11yProps(1)} />
-            <Tab label="关于" {...a11yProps(2)} />
+            <Tab disabled={isInActionFrame} label="状态" {...a11yProps(0)} />
+            <Tab disabled={isInActionFrame} label="设定" {...a11yProps(1)} />
+            <Tab disabled={isInActionFrame} label="关于" {...a11yProps(2)} />
           </Tabs>
         </Box>
         <CustomTabPanel value={tab} index={0}>
