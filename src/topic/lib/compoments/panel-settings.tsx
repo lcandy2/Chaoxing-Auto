@@ -18,7 +18,7 @@ export default function Settings() {
           label="评论数量"
           min={1}
           max={10}
-          initialValue={countTimes}
+          value={countTimes}
           onChange={setCountTimes}
           size="small"
           style={{width: 130}}
@@ -29,7 +29,7 @@ export default function Settings() {
           label="间隔时间（ms）"
           min={100}
           max={10000}
-          initialValue={standbyTime}
+          value={standbyTime}
           step={100}
           onChange={setStandbyTime}
           size="small"

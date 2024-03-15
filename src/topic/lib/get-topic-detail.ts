@@ -8,9 +8,9 @@ export default function GetTopicDetail() {
   const addLogItem = useLogStore.getState().addLogItem;
 
   const detail: TopicDetail = {
-    title: null,
-    content: null,
-    replies: null
+    title: undefined,
+    content: undefined,
+    replies: undefined
   };
 
   if (newDetailMatch && !legacyDetailMatch) {
@@ -66,18 +66,19 @@ export default function GetTopicDetail() {
   return detail;
 }
 
-const getNewTitle = (element) => {
+const getNewTitle = (element: Element) => {
   const topicDetail_title = element.querySelector('.topicDetail_title');
-  const title = topicDetail_title.textContent.trim()
+  const title = topicDetail_title ? topicDetail_title.textContent?.trim() : undefined;
   return title;
 }
 
 const getNewContent = (element: Element) => {
   const topicDetail_main = element.querySelector('.topicDetail_main');
+  if (!topicDetail_main) return undefined;
   const children = Array.from(topicDetail_main.children);
   const content = children
   .filter((child: Element) => !child.classList.contains('topicDetail_info'))
-  .map((child: Element) => child.textContent.trim())
+  .map((child: Element) => child.textContent?.trim())
   .join(' ');
   return content;
 }
@@ -87,14 +88,14 @@ const getNewReply = (element: Element): Reply[] => {
   .map((replyItem: Element) => {
     const authorElement = replyItem.querySelector('.author');
     const replyContent = replyItem.querySelector('.replyContent');
-    const author = authorElement ? authorElement.textContent.trim() : '';
-    const content = replyContent ? replyContent.textContent.trim() : '';
+    const author = authorElement ? authorElement.textContent?.trim() : '';
+    const content = replyContent ? replyContent.textContent?.trim() : '';
     return {author, content};
   });
   return replies;
 }
 
-const getLegacyTitle = (element) => {
+const getLegacyTitle = (element: HTMLElement) => {
   const oneDiv = element.querySelector('.oneDiv');
   let h3Content;
 
@@ -105,20 +106,20 @@ const getLegacyTitle = (element) => {
       if (em) {
         em.remove();
       }
-      h3Content = h3.textContent.trim();
+      h3Content = h3.textContent?.trim();
     }
   }
 
   return h3Content;
 }
 
-const getContent = (element) => {
+const getContent = (element: Element) => {
   const topicContent = element.querySelector('#topicContent');
-  const content = topicContent.textContent.trim();
+  const content = topicContent ? topicContent.textContent?.trim() : undefined;
   return content;
 }
 
-const getReplies = (element) => {
+const getReplies = (element: Element) => {
   let topicReplys;
 
   let replies: Reply[] = [];
@@ -137,11 +138,11 @@ const getReplies = (element) => {
       let h3 = divs[i].querySelector('h3');
 
       if (span) {
-        reply.author = span.textContent.trim();
+        reply.author = span.textContent?.trim();
       }
 
       if (h3) {
-        reply.content = h3.textContent.trim();
+        reply.content = h3.textContent?.trim();
       }
 
       if (reply.content) {

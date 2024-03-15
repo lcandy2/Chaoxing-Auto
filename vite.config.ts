@@ -1,16 +1,15 @@
 import {defineConfig} from 'vite';
-import preact from '@preact/preset-vite';
+import react from '@vitejs/plugin-react';
 import monkey, {cdn} from 'vite-plugin-monkey';
 import {resolve} from 'path'
 import * as TopicConfig from "./src/topic/config";
-import AutoImport from 'unplugin-auto-import/vite'
 
 const matchUrl = (url: URL) => `${url.toString()}*`;
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    preact(),
+    react(),
     monkey({
       entry: 'src/main.tsx',
       userscript: {
@@ -27,11 +26,15 @@ export default defineConfig({
       },
       build: {
         externalGlobals: {
-          preact: cdn.npmmirror('preact', 'dist/preact.min.js'),
-          // "react-draggable": cdn.npmmirror('ReactDraggable', 'build/web/react-draggable.min.js'),
-          // zustand: cdn.npmmirror('zustand', 'umd/index.production.js'),
-          // "@emotion/react": cdn.npmmirror('emotionReact', 'dist/emotion-react.umd.min.js'),
-          // "@mui/material": cdn.npmmirror('@mui/material', 'umd/material-ui.production.min.js'),
+          react: cdn.npmmirror('React', 'umd/react.production.min.js'),
+          'react-dom': cdn.npmmirror(
+              'ReactDOM',
+              'umd/react-dom.production.min.js',
+          ),
+          "react-draggable": cdn.npmmirror('ReactDraggable', 'build/web/react-draggable.min.js'),
+          "@emotion/react": cdn.npmmirror('emotionReact', 'dist/emotion-react.umd.min.js'),
+          "@emotion/styled": cdn.npmmirror('emotionStyled', 'dist/emotion-styled.umd.min.js'),
+          "@mui/material": cdn.npmmirror('MaterialUI', 'umd/material-ui.production.min.js'),
         },
       },
     }),

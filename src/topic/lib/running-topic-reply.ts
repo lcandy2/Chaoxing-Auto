@@ -18,10 +18,10 @@ const isNewVersion = currentVersion === 'new';
 
 const addLogItem = useLogStore.getState().addLogItem;
 
-const makeError = (message: string) => {
+const makeError = (message: any) => {
   let version;
   addLogItem(`----- 执行失败 -----`);
-  addLogItem(message);
+  addLogItem(message.toString());
   addLogItem(`-v=${currentVersion}`);
   console.error(message, currentVersion);
 }
@@ -50,7 +50,7 @@ export default async function RunningTopicReply() {
     });
 
     if (actionButtonToReply && actionTextAreaToReply && actionButtonToSubmit) {
-      window.history.replaceState(null, null, "#cxauto_success");
+      window.history.replaceState(null, "", "#cxauto_success");
       return true;
     }
   } catch (error) {
@@ -60,12 +60,16 @@ export default async function RunningTopicReply() {
 }
 
 const getRandomReplies = (topicDetail: TopicDetail, count: number): string[] => {
+  if (!topicDetail.replies) {
+    throw new Error('topicDetail.replies is undefined');
+  }
+
   const contents = topicDetail.replies.map(reply => reply.content || '');
   const randomContents: string[] = [];
 
-  if (!topicDetail.replies || topicDetail.replies.length === 0) {
+  if (contents.length <= count) {
     for (let i = 0; i < count; i++) {
-        randomContents.push(topicDetail.content || topicDetail.title);
+      randomContents.push(topicDetail.content || topicDetail.title || '');
     }
     return randomContents;
   }
@@ -124,19 +128,19 @@ const ActionTextAreaToReply = async (selector: string) => {
 
 const ActionButtonToSubmit = async ({selector, textarea, contextToReply}: {
   selector: string,
-  textarea: HTMLInputElement,
+  textarea: HTMLInputElement | undefined,
   contextToReply: string[]
 }) => {
   try {
     const element = document.querySelector(selector) as HTMLElement;
 
-    if (!element) throw new Error('无法找到用于提交回复的按钮。');
+    if (!element || !textarea) throw new Error('Required elements not found.');
 
     for (let i = 0; i < contextToReply.length; i++) {
       textarea.value = contextToReply[i];
-      addLogItem(`回复 ${contextToReply[i]} 已填写，等待提交...`);
+      addLogItem(`Reply ${contextToReply[i]} filled, waiting to submit...`);
       if (currentVersion === "legacy") {
-        window.history.replaceState(null, null, "#cxauto_success");
+        window.history.replaceState(null, "", "#cxauto_success");
         element.addEventListener('click', function (event) {
           event.preventDefault();
         });
@@ -148,7 +152,7 @@ const ActionButtonToSubmit = async ({selector, textarea, contextToReply}: {
         continue;
       }
       await Standby(1);
-      addLogItem(`回复已提交，等待继续...`);
+      addLogItem(`Reply submitted, waiting to continue...`);
     }
     addLogItem(`All Done!`);
     return true;

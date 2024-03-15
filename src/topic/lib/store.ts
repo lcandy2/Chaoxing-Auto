@@ -25,7 +25,7 @@ export const useSettingsStore = create(persist(combine(
       setCountTimes: (times: number) => {
         set({countTimes: times});
       },
-      setHasHydrated: (state) => {
+      setHasHydrated: (state: boolean) => {
         set({
           _hasHydrated: state
         });
@@ -34,8 +34,10 @@ export const useSettingsStore = create(persist(combine(
 ), {
   name: "topic_settings",
   storage: createJSONStorage(() => GMStorage),
-  onRehydrateStorage: () => (state) => {
-    state.setHasHydrated(true)
+  onRehydrateStorage: () => (state: any) => {
+    if (state) {
+      state.setHasHydrated(true)
+    }
   }
 }));
 

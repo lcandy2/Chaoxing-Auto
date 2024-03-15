@@ -1,11 +1,11 @@
-import {Button, CircularProgress} from "@mui/material";
+import {Button, CircularProgress, Icon} from "@mui/material";
 import {useEffect, useState} from "react";
 import GetTopicDetail from "@topic/lib/get-topic-detail";
 import {DetailMatch, ListMatch} from "@topic/match";
 import {useLogStore, useStatusStore} from "@topic/lib/store";
 import RunningTopicReply from "@topic/lib/running-topic-reply";
-import CheckIcon from '@mui/icons-material/Check';
-import ErrorIcon from '@mui/icons-material/Error';
+// import CheckIcon from '@mui/icons-material/Check';
+// import ErrorIcon from '@mui/icons-material/Error';
 import {HashStart, HashSuccess} from "@topic/lib/get-hash";
 
 export default function PanelActions() {
@@ -19,15 +19,15 @@ export default function PanelActions() {
   useEffect(() => {
     if (DetailMatch()) {
       setCurrentPage("detail");
+      if (HashStart()) {
+        window.history.replaceState({}, "", "#");
+        setCurrentStatus("triggered");
+      }
     } else if (ListMatch()) {
       setCurrentPage("list");
     }
     if (HashSuccess()) {
       setCurrentStatus("success");
-    }
-    if (HashStart()) {
-      window.history.replaceState(null, null, "#");
-      setCurrentStatus("triggered");
     }
   }, []);
 
@@ -48,7 +48,9 @@ export default function PanelActions() {
       addLogItem(`检测到当前为 [${page}]`);
 
       const topicDetail = GetTopicDetail();
-      setTopicDetail(topicDetail);
+      if (topicDetail) {
+        setTopicDetail(topicDetail);
+      }
     }
   }, [currentPage]);
 
@@ -98,9 +100,9 @@ export default function PanelActions() {
   return (
       <>
         {isButtonDisabled && <CircularProgress size="2em"/>}
-        {currentStatus === "success" && <CheckIcon color="success"/>}
-        {currentStatus === "failed" && <ErrorIcon color="error"/>}
-        {currentPage === "detail" && <Button autofocus disabled={isButtonDisabled} onClick={handleRunningButtonClick}>回复讨论</Button>}
+        {currentStatus === "success" && <Icon color="success">done</Icon>}
+        {currentStatus === "failed" && <Icon color="error">error</Icon>}
+        {currentPage === "detail" && <Button autoFocus disabled={isButtonDisabled} onClick={handleRunningButtonClick}>回复讨论</Button>}
         {currentPage === "list" && <Button disabled>暂不支持</Button>}
       </>)
 }

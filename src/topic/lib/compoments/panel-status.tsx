@@ -4,7 +4,7 @@ import { useLogStore } from "@topic/lib/store";
 
 export default function Status() {
   const { logItems } = useLogStore();
-  const endOfList = useRef(null);
+  const endOfList = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (endOfList.current) {
