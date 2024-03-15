@@ -1,13 +1,19 @@
 import {Button, CircularProgress} from "@mui/material";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import GetTopicDetail from "@topic/lib/get-topic-detail";
 import {DetailMatch, ListMatch} from "@topic/match";
 import {useLogStore, useStatusStore} from "@topic/lib/store";
+import RunningTopicReply from "@topic/lib/running-topic-reply";
+import CheckIcon from '@mui/icons-material/Check';
+import ErrorIcon from '@mui/icons-material/Error';
+import {HashStart, HashSuccess} from "@topic/lib/get-hash";
 
 export default function PanelActions() {
   const {running, setRunning} = useStatusStore()
   const {currentPage, setCurrentPage} = useStatusStore()
   const {topicDetail, setTopicDetail} = useStatusStore()
+  const {currentStatus, setCurrentStatus} = useStatusStore()
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false)
   const {addLogItem} = useLogStore()
 
   useEffect(() => {
@@ -16,7 +22,13 @@ export default function PanelActions() {
     } else if (ListMatch()) {
       setCurrentPage("list");
     }
-    console.log("1")
+    if (HashSuccess()) {
+      setCurrentStatus("success");
+    }
+    if (HashStart()) {
+      window.history.replaceState(null, null, "#");
+      setCurrentStatus("triggered");
+    }
   }, []);
 
   useEffect(() => {
@@ -40,7 +52,6 @@ export default function PanelActions() {
     }
   }, [currentPage]);
 
-
   useEffect(() => {
     if (topicDetail) {
       if (topicDetail.title) {
@@ -55,8 +66,41 @@ export default function PanelActions() {
     }
   }, [topicDetail]);
 
-  return <>
-    {running && <CircularProgress size="2em"/>}
-    <Button autofocus disabled={running}>开始</Button>
-  </>;
+  useEffect(() => {
+    const handleRunningTopicReply = async () => {
+      const result = await RunningTopicReply();
+      if (result) {
+        setCurrentStatus("success");
+      } else {
+        setCurrentStatus("failed");
+      }
+    }
+
+    switch (currentStatus) {
+      case "running":
+        setIsButtonDisabled(true);
+        break;
+      case "triggered":
+        setIsButtonDisabled(true);
+        setCurrentStatus("running");
+        handleRunningTopicReply();
+        break;
+      default:
+        setIsButtonDisabled(false);
+        break;
+    }
+  }, [currentStatus]);
+
+  const handleRunningButtonClick = async () => {
+    setCurrentStatus("triggered");
+  }
+
+  return (
+      <>
+        {isButtonDisabled && <CircularProgress size="2em"/>}
+        {currentStatus === "success" && <CheckIcon color="success"/>}
+        {currentStatus === "failed" && <ErrorIcon color="error"/>}
+        {currentPage === "detail" && <Button autofocus disabled={isButtonDisabled} onClick={handleRunningButtonClick}>回复讨论</Button>}
+        {currentPage === "list" && <Button disabled>暂不支持</Button>}
+      </>)
 }

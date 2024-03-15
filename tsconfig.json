@@ -1,39 +1,3 @@
-//{
-//  "compilerOptions": {
-//    "target": "ESNext",
-//    "useDefineForClassFields": true,
-//    "module": "ESNext",
-//    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-//    "allowJs": false,
-//    "skipLibCheck": true,
-//    "paths": {
-//      "react": ["./node_modules/preact/compat/"],
-//      "react-dom": ["./node_modules/preact/compat/"],
-//      "@/*": ["./src/*"],
-//      "@topic/*": ["./src/topic/*"],
-//    },
-//
-//    /* Bundler mode */
-//    "moduleResolution": "Node",
-//    "esModuleInterop": false,
-//    "allowImportingTsExtensions": true,
-//    "allowSyntheticDefaultImports": true,
-//    "resolveJsonModule": true,
-//    "isolatedModules": true,
-//    "noEmit": true,
-//    "jsx": "react-jsx",
-//    "jsxImportSource": "preact",
-//
-//    /* Linting */
-//    "strict": false,
-//    "noUnusedLocals": true,
-//    "noUnusedParameters": true,
-//    "noFallthroughCasesInSwitch": true
-//  },
-//  "include": ["src"],
-//  "references": [{ "path": "./tsconfig.node.json" }]
-//}
-
 {
   "compilerOptions": {
     "target": "ESNext",

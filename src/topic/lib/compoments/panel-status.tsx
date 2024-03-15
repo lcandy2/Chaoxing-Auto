@@ -1,39 +1,19 @@
-import {List, ListItem, ListItemText} from "@mui/material";
-import {useLogStore} from "@topic/lib/store";
-
-// const LogList = ({param: {logItems}}) => {
-//   return (
-//       <List
-//           dense
-//           sx={{}}
-//       >
-//         {logItems.map((item, index) => (
-//             <ListItem key={index}>
-//               <ListItemText primary={item}
-//                             sx={{typography: 'overline', lineHeight: 'normal', px: 0, my: 0}}
-//                             disableTypography/>
-//             </ListItem>
-//         ))}
-//       </List>
-//   )
-// }
-
-// export default function Status() {
-//   const [logItems] = useAtom(logItemsAtom);
-//   return (
-//       <Provider store={topicStore}>
-//       <LogList param={{logItems}}/>
-//       </Provider>
-//   )
-// }
+import { useEffect, useRef } from 'react';
+import { List, ListItem, ListItemText } from "@mui/material";
+import { useLogStore } from "@topic/lib/store";
 
 export default function Status() {
-  const {logItems} = useLogStore();
+  const { logItems } = useLogStore();
+  const endOfList = useRef(null);
+
+  useEffect(() => {
+    if (endOfList.current) {
+      endOfList.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [logItems]);
+
   return (
-      <List
-          dense
-          sx={{}}
-      >
+      <List dense sx={{}}>
         {logItems.map((item, index) => (
             <ListItem key={index}>
               <ListItemText primary={item}
@@ -41,6 +21,7 @@ export default function Status() {
                             disableTypography/>
             </ListItem>
         ))}
+        <div ref={endOfList} />
       </List>
   )
 }

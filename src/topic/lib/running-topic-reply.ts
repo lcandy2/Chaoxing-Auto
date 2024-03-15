@@ -1,69 +1,74 @@
 import {LegacyDetailMatch, NewDetailMatch} from "@topic/match";
-import {useContext} from "react";
-import {TopicDetail} from "@topic/lib/get-topic-detail";
+import {useLogStore, useSettingsStore, useStatusStore} from "@topic/lib/store";
+import Standby from "@topic/lib/standby";
+import {CurrentVersion, TopicDetail} from "@topic/lib/types";
+import {
+  LEGACY_DETAIL_ACTION_BUTTON_TO_REPLY, LEGACY_DETAIL_ACTION_BUTTON_TO_SUBMIT,
+  LEGACY_DETAIL_ACTION_TEXTAREA,
+  NEW_DETAIL_ACTION_BUTTON_TO_REPLY, NEW_DETAIL_ACTION_BUTTON_TO_SUBMIT, NEW_DETAIL_ACTION_TEXTAREA
+} from "@topic/config";
 
-const newDetailMatch = NewDetailMatch();
-const legacyDetailMatch = LegacyDetailMatch();
+const currentVersion: CurrentVersion = (() => {
+  if (NewDetailMatch() && !LegacyDetailMatch()) return 'new';
+  if (LegacyDetailMatch() && !NewDetailMatch()) return 'legacy';
+  return null;
+})();
 
-const {addLogItem} = useContext(TopicContext);
-export default function RunningTopicReply() {
+const isNewVersion = currentVersion === 'new';
+
+const addLogItem = useLogStore.getState().addLogItem;
+
+const makeError = (message: string) => {
+  let version;
+  addLogItem(`----- 执行失败 -----`);
+  addLogItem(message);
+  addLogItem(`-v=${currentVersion}`);
+  console.error(message, currentVersion);
+}
+
+export default async function RunningTopicReply() {
+  const {countTimes} = useSettingsStore.getState();
+  const {topicDetail, setRunning} = useStatusStore.getState();
+  const contextToReply = getRandomReplies(topicDetail, countTimes);
+  console.debug("currentVersion", currentVersion);
 
   try {
     if (contextToReply.length <= 0) {
-      throw new Error('未获取到讨论回复');
+      throw new Error('未获取到回复评论。');
     }
 
-    let buttonToReply;
-    let textAreaToReply;
-    let buttonToSubmit;
+    const buttonToReply = isNewVersion ? NEW_DETAIL_ACTION_BUTTON_TO_REPLY : LEGACY_DETAIL_ACTION_BUTTON_TO_REPLY;
+    const textAreaToReply = isNewVersion ? NEW_DETAIL_ACTION_TEXTAREA : LEGACY_DETAIL_ACTION_TEXTAREA;
+    const buttonToSubmit = isNewVersion ? NEW_DETAIL_ACTION_BUTTON_TO_SUBMIT : LEGACY_DETAIL_ACTION_BUTTON_TO_SUBMIT
 
-    if (newDetailMatch && !legacyDetailMatch) {
-      const replyBtn = document.querySelector('div.topicDetail_detail div.replyBtn');
-      const replyEdit = document.querySelector('div.topicDetail_editContainer div.replyEdit textarea');
-      const addReply = document.querySelector('div.replyEditBtnGroup div.addReply');
+    const actionButtonToReply = await ActionButtonToReply(buttonToReply);
+    const actionTextAreaToReply = await ActionTextAreaToReply(textAreaToReply);
+    const actionButtonToSubmit = await ActionButtonToSubmit({
+      selector: buttonToSubmit,
+      textarea: actionTextAreaToReply,
+      contextToReply
+    });
 
-      if (replyBtn && replyEdit && addReply) {
-        buttonToReply = replyBtn;
-        textAreaToReply = replyEdit;
-        buttonToSubmit = addReply;
-      } else {
-        throw new Error('找不到新版讨论回复按钮');
-      }
-    } else if (legacyDetailMatch && !newDetailMatch) {
-      const replyBtn = document.querySelector('div.oneDiv p.clearfix a.tl1');
-      const replyEdit = document.querySelector('div.plDiv div.hfpl textarea');
-      const addReply = document.querySelector('div.plDiv div.hfpl input.grenBtn');
-
-      if (replyBtn && replyEdit && addReply) {
-        buttonToReply = replyBtn;
-        textAreaToReply = replyEdit;
-        buttonToSubmit = addReply;
-      } else {
-        throw new Error('找不到旧版讨论回复按钮');
-      }
-    }
-
-    if (buttonToReply && textAreaToReply && buttonToSubmit) {
-      buttonToReply.click();
-      textAreaToReply.click();
-      textAreaToReply.focus();
-      for (let i = 0; i < contextToReply.length; i++) {
-        textAreaToReply.value = contextToReply[i];
-        buttonToSubmit.click();
-      }
+    if (actionButtonToReply && actionTextAreaToReply && actionButtonToSubmit) {
+      window.history.replaceState(null, null, "#cxauto_success");
+      return true;
     }
   } catch (error) {
-    console.error(error);
+    makeError(error);
+    return false;
   }
 }
 
 const getRandomReplies = (topicDetail: TopicDetail, count: number): string[] => {
-  if (!topicDetail.replies || topicDetail.replies.length === 0) {
-    return [];
-  }
-
   const contents = topicDetail.replies.map(reply => reply.content || '');
   const randomContents: string[] = [];
+
+  if (!topicDetail.replies || topicDetail.replies.length === 0) {
+    for (let i = 0; i < count; i++) {
+        randomContents.push(topicDetail.content || topicDetail.title);
+    }
+    return randomContents;
+  }
 
   let avoidDuplicates = true;
 
@@ -82,120 +87,72 @@ const getRandomReplies = (topicDetail: TopicDetail, count: number): string[] => 
   return randomContents;
 }
 
-const ActionButtonToReply = async () => {
-  const contextToReply = getRandomReplies(topicDetail, count);
+const ActionButtonToReply = async (selector: string) => {
   try {
-    let buttonToReply;
+    const element = document.querySelector(selector) as HTMLElement;
+    console.log(element, selector)
 
-    if (newDetailMatch && !legacyDetailMatch) {
-      const replyBtn = document.querySelector('div.topicDetail_detail div.replyBtn');
+    if (!element) throw new Error('无法找到进行回复的按钮。');
 
-      if (replyBtn) {
-        buttonToReply = replyBtn;
-      } else {
-        throw new Error('Cannot Find New Button to Reply');
-      }
-    } else if (legacyDetailMatch && !newDetailMatch) {
-      const replyBtn = document.querySelector('div.oneDiv p.clearfix a.tl1');
+    element.click();
+    addLogItem(`已点击进行回复的按钮，即将继续...`);
+    await Standby(0.1);
 
-      if (replyBtn) {
-        buttonToReply = replyBtn;
-      } else {
-        throw new Error('Cannot Find Legacy Button to Reply');
-      }
-    }
-
-    if (buttonToReply) {
-      buttonToReply.click();
-      addLogItem(`Clicked Button to Reply, waiting...`);
-      await StandBy();
-    }
+    return true;
   } catch (error) {
-    console.error(error);
-    addLogItem(`回复讨论失败：${error}`);
+    makeError(error);
+    return false;
   }
 }
 
-const ActionTextAreaToReply = async () => {
+const ActionTextAreaToReply = async (selector: string) => {
   try {
-    let textAreaToReply;
+    const element = document.querySelector(selector) as HTMLInputElement;
 
-    if (newDetailMatch && !legacyDetailMatch) {
-      const replyEdit = document.querySelector('div.topicDetail_editContainer div.replyEdit textarea');
+    if (!element) throw new Error('无法找到用于回复的文本区域。');
 
-      if (replyEdit) {
-        textAreaToReply = replyEdit;
-      } else {
-        throw new Error('Cannot Find New Textarea');
-      }
-    } else if (legacyDetailMatch && !newDetailMatch) {
-      const replyEdit = document.querySelector('div.plDiv div.hfpl textarea');
+    element.click();
+    element.focus();
+    addLogItem(`已找到用于回复的文本区域，等待回复...`);
+    await Standby(0.1);
 
-      if (replyEdit) {
-        textAreaToReply = replyEdit;
-      } else {
-        throw new Error('Cannot Find Legacy Textarea');
-      }
-    }
-
-    if (textAreaToReply) {
-      textAreaToReply.click();
-      textAreaToReply.focus();
-      addLogItem(`Find Textarea, waiting to reply...`);
-      await StandBy();
-    }
+    return element;
   } catch (error) {
-    console.error(error);
-    addLogItem(`回复讨论失败：${error}`);
+    makeError(error);
   }
 }
 
-const ActionButtonToSubmit = async () => {
-  const {topicDetail, count} = useContext(TopicContext);
-  const contextToReply = getRandomReplies(topicDetail, count);
-
+const ActionButtonToSubmit = async ({selector, textarea, contextToReply}: {
+  selector: string,
+  textarea: HTMLInputElement,
+  contextToReply: string[]
+}) => {
   try {
-    let buttonToSubmit;
+    const element = document.querySelector(selector) as HTMLElement;
 
-    if (newDetailMatch && !legacyDetailMatch) {
-      const addReply = document.querySelector('div.replyEditBtnGroup div.addReply');
+    if (!element) throw new Error('无法找到用于提交回复的按钮。');
 
-      if (addReply) {
-        buttonToSubmit = addReply;
-      } else {
-        throw new Error('Cannot find new submit button.');
+    for (let i = 0; i < contextToReply.length; i++) {
+      textarea.value = contextToReply[i];
+      addLogItem(`回复 ${contextToReply[i]} 已填写，等待提交...`);
+      if (currentVersion === "legacy") {
+        window.history.replaceState(null, null, "#cxauto_success");
+        element.addEventListener('click', function (event) {
+          event.preventDefault();
+        });
       }
-    } else if (legacyDetailMatch && !newDetailMatch) {
-      const addReply = document.querySelector('div.plDiv div.hfpl input.grenBtn');
-
-      if (addReply) {
-        buttonToSubmit = addReply;
-      } else {
-        throw new Error('Cannot find legacy submit button.');
+      await Standby(0.8);
+      element.click();
+      textarea.value = "";
+      if (i === contextToReply.length - 1) {
+        continue;
       }
+      await Standby(1);
+      addLogItem(`回复已提交，等待继续...`);
     }
-
-    if (buttonToSubmit) {
-      for (let i = 0; i < contextToReply.length; i++) {
-        buttonToSubmit.value = contextToReply[i];
-        StandBy(0.5);
-        addLogItem(`Reply ${contextToReply[i]} filled, waiting to submit...`);
-        buttonToSubmit.click();
-        if (i === contextToReply.length - 1) {
-          continue;
-        }
-        StandBy(1);
-        addLogItem(`Reply submitted, waiting for next...`);
-      }
-      addLogItem(`All Done!`);
-    }
+    addLogItem(`All Done!`);
+    return true;
   } catch (error) {
-    console.error(error);
-    addLogItem(`回复讨论失败：${error}`);
+    makeError(error);
   }
-}
-
-const Standby = async (times: number = 1) => {
-
-  return new Promise(resolve => setTimeout(resolve, standbyTime * times));
 }

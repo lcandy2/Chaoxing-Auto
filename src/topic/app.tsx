@@ -9,18 +9,18 @@ import About from "@topic/lib/compoments/panel-about";
 import Settings from "@topic/lib/compoments/panel-settings";
 import Status from "@topic/lib/compoments/panel-status";
 import PanelActions from "@topic/lib/compoments/panel-actions";
+import {CurrentTab} from "@topic/lib/types";
 
 export default function App() {
   const [open, setOpen] = useState(true);
-  const [tab, setTab] = useGMValue("topic_replyTab", "status")
-  const [currentPage, setCurrentPage] = useState(null);
-  const [topicDetail, setTopicDetail] = useState(null);
+  // const [tab, setTab] = useGMValue("topic_replyTab", "status")
+    const [tab, setTab] = useState<CurrentTab>("status");
 
   const handleClose = () => {
     setOpen(false);
   }
 
-  const handleTabChange = (_: Event, newValue: string) => {
+  const handleTabChange = (_: Event, newValue: CurrentTab) => {
     setTab(newValue);
   };
 
@@ -69,7 +69,7 @@ export default function App() {
                       </TabList>
                       <TabPanel value="status" sx={{
                         p: 0,
-                        maxWidth: 360,
+                        maxWidth: 280,
                         maxHeight: 300,
                         minWidth: 260,
                         minHeight: 200,
@@ -79,7 +79,7 @@ export default function App() {
                       </TabPanel>
                       <TabPanel value="settings" sx={{
                         p: 0,
-                        maxWidth: 360,
+                        maxWidth: 280,
                         maxHeight: 300,
                         minWidth: 260,
                         minHeight: 200,
@@ -88,7 +88,7 @@ export default function App() {
                         <Settings/>
                       </TabPanel>
                       <TabPanel value="about" sx={{
-                        maxWidth: 360,
+                        maxWidth: 280,
                         maxHeight: 300,
                         minWidth: 260,
                         minHeight: 200,

@@ -1,7 +1,7 @@
 import {create} from "zustand";
 import {combine, createJSONStorage, persist} from "zustand/middleware";
 import GMStorage from "@topic/lib/hooks/gm-storage";
-import {CurrentPage, TopicDetail} from "@topic/lib/types";
+import {CurrentPage, CurrentStatus, TopicDetail} from "@topic/lib/types";
 
 export const useLogStore = create(combine(
     {
@@ -42,11 +42,15 @@ export const useSettingsStore = create(persist(combine(
 export const useStatusStore = create(combine(
     {
       running: <boolean>false,
-      currentPage: <CurrentPage>false,
+      currentStatus: <CurrentStatus>null,
+      currentPage: <CurrentPage>null,
       topicDetail: <TopicDetail>{},
     }, (set) => ({
       setRunning: (running: boolean) => {
         set({running});
+      },
+      setCurrentStatus: (currentStatus: CurrentStatus) => {
+        set({currentStatus});
       },
       setCurrentPage: (currentPage: CurrentPage) => {
         set({currentPage});

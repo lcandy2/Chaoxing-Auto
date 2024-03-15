@@ -21,25 +21,3 @@ export default function useGMValue(key, defaultValue) {
 
   return [value, setGMValue];
 }
-
-import {atom, useAtom} from 'jotai';
-
-// ... 其他代码
-
-export function useGMValueWithAtom(key, defaultValue) {
-  const [value, setGMValue] = useGMValue(key, defaultValue);
-  const valueAtom = atom(defaultValue);
-
-  useEffect(() => {
-    const listenerId = GM_addValueChangeListener(key, (_, __, newValue) => {
-      setGMValue(newValue);
-      useAtom(valueAtom);
-    });
-
-    return () => {
-      GM_removeValueChangeListener(listenerId);
-    };
-  }, [key, valueAtom]);
-
-  return [valueAtom, setGMValue];
-}

@@ -3,6 +3,7 @@ import preact from '@preact/preset-vite';
 import monkey, {cdn} from 'vite-plugin-monkey';
 import {resolve} from 'path'
 import * as TopicConfig from "./src/topic/config";
+import AutoImport from 'unplugin-auto-import/vite'
 
 const matchUrl = (url: URL) => `${url.toString()}*`;
 
@@ -13,8 +14,7 @@ export default defineConfig({
     monkey({
       entry: 'src/main.tsx',
       userscript: {
-        icon: 'https://vitejs.dev/logo.svg',
-        namespace: 'npm/vite-plugin-monkey',
+        namespace: 'lcandy2/chaoxing-auto',
         match: [
           // Topic
           matchUrl(TopicConfig.LEGACY_LIST), // Legacy List
@@ -27,7 +27,11 @@ export default defineConfig({
       },
       build: {
         externalGlobals: {
-          preact: cdn.jsdelivr('preact', 'dist/preact.min.js'),
+          preact: cdn.npmmirror('preact', 'dist/preact.min.js'),
+          // "react-draggable": cdn.npmmirror('ReactDraggable', 'build/web/react-draggable.min.js'),
+          // zustand: cdn.npmmirror('zustand', 'umd/index.production.js'),
+          // "@emotion/react": cdn.npmmirror('emotionReact', 'dist/emotion-react.umd.min.js'),
+          // "@mui/material": cdn.npmmirror('@mui/material', 'umd/material-ui.production.min.js'),
         },
       },
     }),
@@ -43,5 +47,16 @@ export default defineConfig({
         replacement: resolve(__dirname, './src/topic')
       }
     ]
+  },
+  build: {
+    minify: 'terser',
+    terserOptions: {
+      compress: true, // 禁用压缩
+      mangle: true, // 启用变量名和函数名混淆
+      format: {
+        beautify: true, // 保持代码格式化
+        comments: false // 删除所有注释
+      }
+    },
   },
 });
