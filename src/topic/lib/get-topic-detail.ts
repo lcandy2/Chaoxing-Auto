@@ -76,6 +76,34 @@ const getNewTitle = (element: Element) => {
   return title;
 };
 
+export const observeReplies = (callback: () => void) => {
+  const element = document.querySelector(".topicDetail_replyList");
+
+  if (!element) {
+    console.error("Element not found");
+    return;
+  }
+
+  // 如果子节点数量已经大于1，直接执行回调函数
+  if (element.children.length > 1) {
+    callback();
+    return;
+  }
+
+  const observer = new MutationObserver((mutationsList, observer) => {
+    for (let mutation of mutationsList) {
+      if (mutation.type === "childList") {
+        callback();
+      }
+    }
+  });
+
+  const config = { attributes: false, childList: true, subtree: true };
+  observer.observe(element, config);
+
+  return () => observer.disconnect();
+};
+
 const getNewContent = (element: Element) => {
   const topicDetail_main = element.querySelector(".topicDetail_main");
   if (!topicDetail_main) return undefined;
@@ -86,6 +114,7 @@ const getNewContent = (element: Element) => {
     .join(" ");
   return content;
 };
+
 const getNewReply = async (element: Element): Promise<Reply[]> => {
   const replyCountElem = document.querySelector(".classReplyCount span");
   const replyCountNum: number = Number(replyCountElem?.textContent || 0);
@@ -101,17 +130,14 @@ const getNewReply = async (element: Element): Promise<Reply[]> => {
       const content = replyContent ? replyContent.textContent?.trim() : "";
       return { author, content };
     });
-
-    if (replyCountNum === 0) {
-      return replies;
-    } else if (replies.length > 0) {
-      return replies;
-    } else {
-      getReplies();
-    }
+    return replies;
   };
-  const replies = getReplies();
-  return replies || [];
+  let replies = getReplies();
+  if (replyCountNum === 0 || replies.length > 0) {
+    return replies;
+  } else {
+    return [{ content: "NEED_OBSERVE" }];
+  }
 };
 
 const getLegacyTitle = (element: HTMLElement) => {

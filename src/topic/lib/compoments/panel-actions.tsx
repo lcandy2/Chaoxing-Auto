@@ -1,7 +1,7 @@
 import { Button, CircularProgress, Icon, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import GetTopicDetail from "@topic/lib/get-topic-detail";
-import { DetailMatch, ListMatch } from "@topic/match";
+import GetTopicDetail, { observeReplies } from "@topic/lib/get-topic-detail";
+import { DetailMatch, ListMatch, NewMatch } from "@topic/match";
 import { useLogStore, useStatusStore } from "@topic/lib/store";
 import {
   AppendHashSuccess,
@@ -55,9 +55,35 @@ export default function PanelActions() {
     const handleGetTopicDetail = async () => {
       const topicDetail = await GetTopicDetail();
       if (topicDetail) {
-        setTopicDetail(topicDetail);
-        if (!currentStatus) setCurrentStatus("idle");
+        if (
+          topicDetail.replies &&
+          topicDetail.replies[0].content === "NEED_OBSERVE"
+        ) {
+          console.debug("NEED_OBSERVE");
+          let stopObserving: (() => void) | undefined;
+
+          stopObserving = observeReplies(async () => {
+            console.log("Replies changed");
+            if (stopObserving) {
+              stopObserving();
+            }
+            const topicDetail = await GetTopicDetail();
+            if (topicDetail) {
+              console.debug("topicDetail", topicDetail);
+              setTopicDetail(topicDetail);
+              if (!currentStatus) setCurrentStatus("idle");
+            }
+          });
+        } else {
+          setTopicDetail(topicDetail);
+          if (!currentStatus) setCurrentStatus("idle");
+        }
       }
+      // if (NewMatch()) {
+      //   console.debug("new version, start observing.")
+      //
+      // } else {
+      // }
     };
 
     if (currentPage === "list" || currentPage === "detail") {
