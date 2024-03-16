@@ -6,7 +6,7 @@ import {
 import { TopicList } from "@topic/lib/types";
 import MakeError from "@topic/lib/make-error";
 import Standby from "@topic/lib/standby";
-import { NewMatch } from "@topic/match";
+import { LegacyMatch, NewMatch } from "@topic/match";
 import {
   LEGACY_LIST_ACTION_NEW_TOPIC_BUTTON,
   LEGACY_LIST_ACTION_NEW_TOPIC_SUBMIT,
@@ -16,6 +16,7 @@ import {
   NEW_LIST_ACTION_NEW_TOPIC_SUBMIT,
   NEW_LIST_ACTION_NEW_TOPIC_TITLE_INPUT,
 } from "@topic/config";
+import { GetHashActionNewTopicTitle } from "@topic/lib/hash";
 
 export default async function RunningNewTopic() {
   const { newTopicCountTimes } = useSettingsStore.getState();
@@ -38,9 +39,14 @@ export default async function RunningNewTopic() {
 
   const actionClickNewTopicButton = await ActionClickNewTopicButton(elem1);
   if (actionClickNewTopicButton) {
+    let title = GetHashActionNewTopicTitle();
+
+    if (title === "") {
+      title = "如何学好该课程？";
+    }
     const actionInputNewTopicTitle = await ActionInputNewTopicTitle(
       elem2,
-      "如何学好该课程？",
+      title,
     );
     if (actionInputNewTopicTitle) {
       const actionClickNewTopicSubmit = await ActionClickNewTopicSubmit(elem3);
@@ -54,37 +60,37 @@ export default async function RunningNewTopic() {
 
 const addLogItem = useLogStore.getState().addLogItem;
 
-// const getRandomTitle = (topicList: TopicList[], count: number) => {
-//   const randomTitleList: string[] = [];
-//
-//   const titleList: string[] = topicList
-//   .map((item) => item.title)
-//   .filter((title): title is string => title !== undefined);
-//
-//   if (titleList.length <= 0) {
-//     for (let i = 0; i < count; i++) {
-//       randomTitleList.push("如何学好该课程？");
-//     }
-//     return randomTitleList;
-//   }
-//
-//   let avoidDuplicates = true;
-//
-//   if (titleList.length <= count) {
-//     avoidDuplicates = false;
-//   }
-//
-//   for (let i = 0; i < count; i++) {
-//     const randomIndex = Math.floor(Math.random() * titleList.length);
-//     let randomTitle = titleList[randomIndex];
-//     if (avoidDuplicates) {
-//       titleList.splice(randomIndex, 1);
-//     }
-//     randomTitleList.push(randomTitle);
-//   }
-//
-//   return randomTitleList;
-// };
+export const getRandomTitle = (topicList: TopicList[], count: number) => {
+  const randomTitleList: string[] = [];
+
+  const titleList: string[] = topicList
+    .map((item) => item.title)
+    .filter((title): title is string => title !== undefined);
+
+  if (titleList.length <= 0) {
+    for (let i = 0; i < count; i++) {
+      randomTitleList.push("如何学好该课程？");
+    }
+    return randomTitleList;
+  }
+
+  let avoidDuplicates = true;
+
+  if (titleList.length <= count) {
+    avoidDuplicates = false;
+  }
+
+  for (let i = 0; i < count; i++) {
+    const randomIndex = Math.floor(Math.random() * titleList.length);
+    let randomTitle = titleList[randomIndex];
+    if (avoidDuplicates) {
+      titleList.splice(randomIndex, 1);
+    }
+    randomTitleList.push(randomTitle);
+  }
+
+  return randomTitleList;
+};
 
 const ActionClickNewTopicButton = async (selector: string) => {
   try {
@@ -127,8 +133,15 @@ const ActionClickNewTopicSubmit = async (selector: string) => {
     const element = document.querySelector(selector) as HTMLElement;
     if (!element) throw new Error("无法找到发表讨论的按钮。");
 
-    element.click();
     addLogItem(`已点击发表讨论的按钮，即将继续...`);
+
+    if (LegacyMatch()) {
+      window.alert = () => {
+        return false;
+      };
+    }
+
+    element.click();
     await Standby(1);
 
     return true;

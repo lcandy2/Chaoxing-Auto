@@ -13,7 +13,7 @@ export default defineConfig({
     monkey({
       entry: "src/main.tsx",
       userscript: {
-        name: "超兴学习通自动化 ——— Chaoxing Auto",
+        name: "超兴学习通自动化 ——— Chaoxing Auto（学习通自动完成讨论）",
         description:
           "超兴学习通自动化脚本，能自动完成讨论，具备自动完成讨论任务、一键回复指定话题、批量回复和创建话题等功能，让讨论任务变得轻松简单。",
         namespace: "https://github.com/lcandy2/Chaoxing-Auto",

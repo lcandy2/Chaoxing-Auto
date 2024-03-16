@@ -25,21 +25,21 @@ export default function Settings() {
           style={{ width: 130 }}
         />
       </ListItem>
-      {/*<ListItem sx={{ pt: 3 }}>*/}
-      {/*  <NumberInput*/}
-      {/*    label="发起讨论数量"*/}
-      {/*    min={1}*/}
-      {/*    max={10}*/}
-      {/*    value={newTopicCountTimes}*/}
-      {/*    onChange={setNewTopicCountTimes}*/}
-      {/*    size="small"*/}
-      {/*    style={{ width: 130 }}*/}
-      {/*  />*/}
-      {/*</ListItem>*/}
+      <ListItem sx={{ pt: 3 }}>
+        <NumberInput
+          label="发起讨论数量"
+          min={1}
+          max={10}
+          value={newTopicCountTimes}
+          onChange={setNewTopicCountTimes}
+          size="small"
+          style={{ width: 130 }}
+        />
+      </ListItem>
       <ListItem sx={{ pt: 3 }}>
         <NumberInput
           label="间隔时间（ms）"
-          min={100}
+          min={500}
           max={10000}
           value={standbyTime}
           step={100}

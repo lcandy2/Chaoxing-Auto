@@ -17,6 +17,7 @@ import useTopicDetailReply, {
 import RunningTopicListReply from "@topic/lib/running-topic-list-reply";
 import { PostMessageSuccess } from "@topic/lib/window-message";
 import useCurrentStatus from "@topic/lib/hooks/use-current-status";
+import RunningMultiNewTopic from "@topic/lib/running-multi-new-topic";
 
 export default function PanelActions() {
   const { currentPage, setCurrentPage } = useStatusStore();
@@ -32,6 +33,8 @@ export default function PanelActions() {
     setActionFrameStatusStatus,
   } = useStatusStore();
   const actionFrameStatusStatus = actionFrameStatus.status;
+  const { actionFrameRunningType, setActionFrameRunningType } =
+    useStatusStore();
 
   useEffect(() => {
     const hashSuccess = GetHashSuccess();
@@ -122,6 +125,7 @@ export default function PanelActions() {
     setIsButtonDisabled,
     setIsInActionFrame,
     actionFrameStatusStatus,
+    actionFrameRunningType,
   });
 
   useEffect(() => {
@@ -139,10 +143,13 @@ export default function PanelActions() {
 
   const handleRunningTopicListReplyButtonClick = async () => {
     setActionFrameStatusStatus("triggered");
+    setActionFrameRunningType("multiReply");
   };
 
   const handleRunningNewTopicButtonClick = async () => {
-    setCurrentStatus("triggered");
+    // setCurrentStatus("triggered");
+    setActionFrameStatusStatus("triggered");
+    setActionFrameRunningType("newTopic");
   };
 
   useEffect(() => {
@@ -160,6 +167,14 @@ export default function PanelActions() {
         }
       }
     };
+    const handleRunningMultiNewTopic = async () => {
+      if (status) {
+        const result = await RunningMultiNewTopic(status);
+        if (result) {
+          setActionFrameStatusStatus("finished");
+        }
+      }
+    };
     if (
       status === "triggered" ||
       status === "waitingToStart" ||
@@ -167,8 +182,13 @@ export default function PanelActions() {
       status === "failed" ||
       status === "success"
     ) {
-      handleRunningTopicListReply();
-      setCurrentStatus("running");
+      if (actionFrameRunningType === "multiReply") {
+        handleRunningTopicListReply();
+        setCurrentStatus("running");
+      } else if (actionFrameRunningType === "newTopic") {
+        handleRunningMultiNewTopic();
+        setCurrentStatus("running");
+      }
     } else if (status === "finished") {
       setCurrentStatus("success");
     } else if (status === "idle") {
@@ -202,17 +222,20 @@ export default function PanelActions() {
           回复讨论
         </Button>
       )}
-      {currentPage === "list" && (
+      {currentPage === "list" && !isInActionFrame && (
         <>
           <Button
             autoFocus
             disabled={isButtonDisabled}
             onClick={handleRunningNewTopicButtonClick}
           >
-            {currentStatus === "success" &&
-              actionFrameStatusStatus !== "finished" && (
+            {actionFrameStatusStatus === "finished" &&
+              actionFrameRunningType === "newTopic" && (
                 <Icon color="success">done</Icon>
               )}
+            {actionFrameStatusStatus === "finished" &&
+              actionFrameRunningType === "newTopic" &&
+              "再次"}
             发起讨论
           </Button>
 
@@ -224,10 +247,12 @@ export default function PanelActions() {
             disabled={isButtonDisabled}
             onClick={handleRunningTopicListReplyButtonClick}
           >
-            {actionFrameStatusStatus === "finished" && (
-              <Icon color="success">done</Icon>
-            )}
-            {actionFrameStatusStatus === "finished"
+            {actionFrameStatusStatus === "finished" &&
+              actionFrameRunningType === "multiReply" && (
+                <Icon color="success">done</Icon>
+              )}
+            {actionFrameStatusStatus === "finished" &&
+            actionFrameRunningType === "multiReply"
               ? "再次批量回复"
               : "批量回复讨论"}
           </Button>

@@ -6,6 +6,7 @@ const HashStart = "cxauto_start";
 const HashSuccess = "cxauto_success_";
 const HashActionTrigger = "cxauto_action_trigger";
 const HashActionReplyIndex = "cxauto_action_reply_index_";
+const HashActionNewTopicTitle = "cxauto_action_new_topic_title_";
 
 const appendHash = (text: string) => {
   if (hash.includes(text)) return;
@@ -40,6 +41,15 @@ export const GetHashActionReplyIndex = () => {
     return parseInt(index[1]);
   }
   return 0;
+};
+
+export const GetHashActionNewTopicTitle = () => {
+  const text = HashActionNewTopicTitle;
+  const title = hash.match(new RegExp(`${text}([^#]+)`));
+  if (title) {
+    return decodeURIComponent(title[1]);
+  }
+  return "";
 };
 
 export const AppendHashStart = (url?: string) => {
@@ -79,4 +89,11 @@ export const AppendHashActionReplyIndex = (index: number, url?: string) => {
   return true;
 };
 
-export const AppendHashActionType = (type: string, url?: string) => {};
+export const AppendHashActionNewTopicTitle = (title: string, url?: string) => {
+  const text = `${HashActionNewTopicTitle}${title}`;
+  if (url) {
+    return `${url}#${text}`;
+  }
+  appendHash(text);
+  return true;
+};

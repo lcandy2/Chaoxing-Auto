@@ -72,6 +72,8 @@ export const useStatusStore = create(
       actionNewTopicStatus: <ActionNewTopicStatus>null,
       topicDetail: <TopicDetail>{},
       topicList: <TopicList[]>[],
+      titleList: <string[]>[],
+      actionFrameRunningType: <"multiReply" | "newTopic">"",
     },
     (set) => ({
       setCurrentStatus: (currentStatus: CurrentStatus) => {
@@ -128,6 +130,14 @@ export const useStatusStore = create(
       },
       setTopicList: (topicList: TopicList[]) => {
         set({ topicList });
+      },
+      setTitleList: (titleList: string[]) => {
+        set({ titleList });
+      },
+      setActionFrameRunningType: (
+        actionFrameRunningType: "multiReply" | "newTopic",
+      ) => {
+        set({ actionFrameRunningType });
       },
     }),
   ),

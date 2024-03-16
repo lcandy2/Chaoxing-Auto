@@ -21,12 +21,14 @@ export default function useCurrentStatus({
   setIsButtonDisabled,
   setIsInActionFrame,
   actionFrameStatusStatus,
+  actionFrameRunningType,
 }: {
   setCurrentStatus: (status: CurrentStatus) => void;
   currentStatus: CurrentStatus;
   setIsButtonDisabled: (state: boolean) => void;
   setIsInActionFrame: (state: boolean) => void;
   actionFrameStatusStatus: ActionFrameStatusStatus | undefined;
+  actionFrameRunningType: "multiReply" | "newTopic" | "";
 }) {
   const { addLogItem } = useLogStore();
 
@@ -49,9 +51,13 @@ export default function useCurrentStatus({
         if (DetailMatch()) {
           AppendHashSuccess("singleReply");
         } else if (actionFrameStatusStatus === "finished") {
-          AppendHashSuccess("multiReply");
-        } else if (ListMatch()) {
-          AppendHashSuccess("newTopic");
+          if (actionFrameRunningType === "multiReply") {
+            AppendHashSuccess("multiReply");
+          } else if (actionFrameRunningType === "newTopic") {
+            AppendHashSuccess("newTopic");
+          } else {
+            AppendHashSuccess();
+          }
         } else {
           AppendHashSuccess();
         }
