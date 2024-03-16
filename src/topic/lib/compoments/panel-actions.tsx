@@ -52,16 +52,20 @@ export default function PanelActions() {
   }, []);
 
   useEffect(() => {
+    const handleGetTopicDetail = async () => {
+      const topicDetail = await GetTopicDetail();
+      if (topicDetail) {
+        setTopicDetail(topicDetail);
+        if (!currentStatus) setCurrentStatus("idle");
+      }
+    };
+
     if (currentPage === "list" || currentPage === "detail") {
       let page: string;
       switch (currentPage) {
         case "detail":
           page = "讨论详情";
-          const topicDetail = GetTopicDetail();
-          if (topicDetail) {
-            setTopicDetail(topicDetail);
-            if (!currentStatus) setCurrentStatus("idle");
-          }
+          handleGetTopicDetail();
           break;
         case "list":
           page = "讨论列表";
@@ -100,7 +104,7 @@ export default function PanelActions() {
       console.debug("PostMessageSuccess");
       PostMessageSuccess();
     }
-  }, [isInActionFrame]);
+  }, [isInActionFrame, currentStatus]);
 
   const handleRunningTopicListReplyButtonClick = async () => {
     setActionFrameStatusStatus("triggered");

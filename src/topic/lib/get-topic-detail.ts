@@ -1,8 +1,9 @@
 import { LegacyDetailMatch, NewDetailMatch } from "@topic/match";
 import { Reply, TopicDetail } from "@topic/lib/types";
 import { useLogStore } from "@topic/lib/store";
+import Standby from "@topic/lib/standby";
 
-export default function GetTopicDetail() {
+export default async function GetTopicDetail() {
   const newDetailMatch = NewDetailMatch();
   const legacyDetailMatch = LegacyDetailMatch();
   const addLogItem = useLogStore.getState().addLogItem;
@@ -26,7 +27,7 @@ export default function GetTopicDetail() {
 
       const title = getNewTitle(topicDetail_detail);
       const content = getNewContent(topicDetail_detail);
-      const replies = getNewReply(topicDetail_replyList);
+      const replies = await getNewReply(topicDetail_replyList);
 
       detail.title = title;
       detail.content = content;
@@ -85,18 +86,32 @@ const getNewContent = (element: Element) => {
     .join(" ");
   return content;
 };
-const getNewReply = (element: Element): Reply[] => {
-  const replyItems = Array.from(
-    element.querySelectorAll(".topicDetail_replyItem"),
-  ) as Element[];
-  const replies = replyItems.map((replyItem: Element) => {
-    const authorElement = replyItem.querySelector(".author");
-    const replyContent = replyItem.querySelector(".replyContent");
-    const author = authorElement ? authorElement.textContent?.trim() : "";
-    const content = replyContent ? replyContent.textContent?.trim() : "";
-    return { author, content };
-  });
-  return replies;
+const getNewReply = async (element: Element): Promise<Reply[]> => {
+  const replyCountElem = document.querySelector(".classReplyCount span");
+  const replyCountNum: number = Number(replyCountElem?.textContent || 0);
+  const getReplies = () => {
+    Standby(0.5);
+    const replyItems = Array.from(
+      element.querySelectorAll(".topicDetail_replyItem"),
+    ) as Element[];
+    const replies: Reply[] = replyItems.map((replyItem: Element) => {
+      const authorElement = replyItem.querySelector(".author");
+      const replyContent = replyItem.querySelector(".replyContent");
+      const author = authorElement ? authorElement.textContent?.trim() : "";
+      const content = replyContent ? replyContent.textContent?.trim() : "";
+      return { author, content };
+    });
+
+    if (replyCountNum === 0) {
+      return replies;
+    } else if (replies.length > 0) {
+      return replies;
+    } else {
+      getReplies();
+    }
+  };
+  const replies = getReplies();
+  return replies || [];
 };
 
 const getLegacyTitle = (element: HTMLElement) => {

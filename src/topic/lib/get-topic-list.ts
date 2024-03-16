@@ -15,6 +15,9 @@ export default function GetTopicList() {
 
   try {
     if (isNewVersion) {
+      const getNewItems = GetNewItems();
+      console.debug("getNewItems", getNewItems);
+      return getNewItems;
     } else {
       const getLegacyItems = GetLegacyItems();
       console.debug("getLegacyItems", getLegacyItems);
@@ -47,5 +50,27 @@ const GetLegacyItems = (): TopicList[] => {
       const url = titleElement?.getAttribute("href") || "";
       return { title, author, replyCount, url };
     });
+  return result;
+};
+
+const GetNewItems = (): TopicList[] => {
+  const selector = "div.dataCon ul.dataBody li.dataBody_topic";
+  const items = Array.from(document.querySelectorAll(selector));
+  const result: TopicList[] = items.map((item: Element) => {
+    // const titleSelector = "div.topicli_title";
+    // const titleElement = item.querySelector(titleSelector);
+    // const title = titleElement?.textContent?.trim() || "";
+    const authorSelector = "span.author";
+    const authorElement = item.querySelector(authorSelector);
+    const author = authorElement?.textContent?.trim() || "";
+    const replyCountSelector = "div.topic_interactive div.comment span";
+    const replyCountElement = item.querySelector(replyCountSelector);
+    const replyCount = replyCountElement?.textContent?.trim() || "";
+    const urlSelector = "a.topicli_link";
+    const urlElement = item.querySelector(urlSelector);
+    const url = urlElement?.getAttribute("href") || "";
+    const title = urlElement?.textContent?.trim() || "";
+    return { title, author, replyCount, url };
+  });
   return result;
 };
