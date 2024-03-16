@@ -15,6 +15,7 @@ import useTopicDetailReply, {
 } from "@topic/lib/hooks/use-topic-detail-reply";
 import RunningTopicListReply from "@topic/lib/running-topic-list-reply";
 import { PostMessageSuccess } from "@topic/lib/window-message";
+import useCurrentStatus from "@topic/lib/hooks/use-current-status";
 
 export default function PanelActions() {
   const { currentPage, setCurrentPage } = useStatusStore();
@@ -33,21 +34,13 @@ export default function PanelActions() {
 
   useEffect(() => {
     const hashSuccess = GetHashSuccess();
-    const hashAction = GetHashAction();
-    const hashStart = GetHashStart() || hashAction;
-    if (DetailMatch()) {
-      setCurrentPage("detail");
-      if (hashAction) setIsInActionFrame(true);
-      if (hashStart) {
-        if (!hashSuccess) {
-          setCurrentStatus("triggered");
-        }
-      }
-    } else if (ListMatch()) {
-      setCurrentPage("list");
-    }
     if (hashSuccess) {
       setCurrentStatus("success");
+    }
+    if (DetailMatch()) {
+      setCurrentPage("detail");
+    } else if (ListMatch()) {
+      setCurrentPage("list");
     }
   }, []);
 
@@ -79,11 +72,6 @@ export default function PanelActions() {
           if (!currentStatus) setCurrentStatus("idle");
         }
       }
-      // if (NewMatch()) {
-      //   console.debug("new version, start observing.")
-      //
-      // } else {
-      // }
     };
 
     if (currentPage === "list" || currentPage === "detail") {
@@ -112,12 +100,16 @@ export default function PanelActions() {
 
   useTopicDetailReply({
     topicDetail,
-    setCurrentStatus,
-    currentStatus,
-    setIsButtonDisabled,
   });
   const handleRunningTopicDetailReplyButtonClick =
     handleRunningTopicDetailStart({ setCurrentStatus });
+
+  useCurrentStatus({
+    setCurrentStatus,
+    currentStatus,
+    setIsButtonDisabled,
+    setIsInActionFrame,
+  });
 
   useEffect(() => {
     if (topicList.length) {

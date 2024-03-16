@@ -1,19 +1,18 @@
 import { useEffect } from "react";
 import RunningTopicDetailReply from "@topic/lib/running-topic-detail-reply";
-import { AppendHashSuccess } from "@topic/lib/hash";
+import {
+  AppendHashSuccess,
+  GetHashAction,
+  GetHashStart,
+} from "@topic/lib/hash";
 import { CurrentStatus, TopicDetail } from "@topic/lib/types";
 import { useLogStore } from "@topic/lib/store";
+import { DetailMatch, ListMatch } from "@topic/match";
 
 export default function useTopicDetailReply({
   topicDetail,
-  setCurrentStatus,
-  currentStatus,
-  setIsButtonDisabled,
 }: {
   topicDetail: TopicDetail;
-  setCurrentStatus: (status: CurrentStatus) => void;
-  currentStatus: CurrentStatus;
-  setIsButtonDisabled: (state: boolean) => void;
 }) {
   const { addLogItem } = useLogStore();
 
@@ -30,42 +29,6 @@ export default function useTopicDetailReply({
       }
     }
   }, [topicDetail]);
-
-  useEffect(() => {
-    const handleRunningTopicReply = async () => {
-      const result = await RunningTopicDetailReply();
-      if (result) {
-        setCurrentStatus("success");
-      } else {
-        setCurrentStatus("failed");
-      }
-    };
-
-    switch (currentStatus) {
-      case "running":
-        setIsButtonDisabled(true);
-        break;
-      case "triggered":
-        setIsButtonDisabled(true);
-        setCurrentStatus("running");
-        handleRunningTopicReply();
-        break;
-      case "success":
-        setIsButtonDisabled(false);
-        AppendHashSuccess();
-        addLogItem("All done!");
-        break;
-      case "idle":
-        setIsButtonDisabled(false);
-        break;
-      case "failed":
-        setIsButtonDisabled(false);
-        break;
-      default:
-        setIsButtonDisabled(true);
-        break;
-    }
-  }, [currentStatus]);
 }
 
 export const handleRunningTopicDetailStart = ({
@@ -77,4 +40,17 @@ export const handleRunningTopicDetailStart = ({
     setCurrentStatus("triggered");
   };
   return handleRunningTopicDetailReplyButtonClick;
+};
+
+export const handleRunningTopicReply = async ({
+  setCurrentStatus,
+}: {
+  setCurrentStatus: (status: CurrentStatus) => void;
+}) => {
+  const result = await RunningTopicDetailReply();
+  if (result) {
+    setCurrentStatus("success");
+  } else {
+    setCurrentStatus("failed");
+  }
 };

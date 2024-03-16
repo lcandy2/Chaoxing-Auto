@@ -159,7 +159,7 @@ const ActionButtonToSubmit = async ({
           event.preventDefault();
         });
       }
-      await Standby(0.8);
+      await Standby(2);
       element.click();
       textarea.value = "";
       if (i === contextToReply.length - 1) {
