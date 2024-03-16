@@ -159,14 +159,14 @@ const ActionButtonToSubmit = async ({
           event.preventDefault();
         });
       }
-      await Standby(2);
+      await Standby(1);
       element.click();
       textarea.value = "";
       if (i === contextToReply.length - 1) {
         continue;
       }
-      await Standby(1);
       addLogItem(`Reply submitted, waiting to continue...`);
+      await Standby(1);
     }
     return true;
   } catch (error) {

@@ -23,6 +23,15 @@ export const GetHashAction = () => {
   return hash.includes(text);
 };
 
+export const GetHashIndex = () => {
+  const text = "cxauto_index_";
+  const index = hash.match(/cxauto_index_(\d+)/);
+  if (index) {
+    return parseInt(index[1]);
+  }
+  return 0;
+};
+
 export const AppendHashStart = (url?: string) => {
   const text = "cxauto_start";
   if (url) {
@@ -44,6 +53,15 @@ export const AppendHashSuccess = (url?: string) => {
 
 export const AppendHashAction = (url?: string) => {
   const text = "cxauto_action";
+  if (url) {
+    return `${url}#${text}`;
+  }
+  appendHash(text);
+  return true;
+};
+
+export const AppendHashActionIndex = (index: number, url?: string) => {
+  const text = `#cxauto_index_${index}`;
   if (url) {
     return `${url}#${text}`;
   }

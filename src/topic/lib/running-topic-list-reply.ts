@@ -1,7 +1,11 @@
 import { useLogStore, useStatusStore } from "@topic/lib/store";
-import { AppendHashAction, AppendHashStart } from "@topic/lib/hash";
+import {
+  AppendHashAction,
+  AppendHashActionIndex,
+  AppendHashStart,
+} from "@topic/lib/hash";
 import MakeError from "@topic/lib/make-error";
-import { ReceiveMessage } from "@topic/lib/window-message";
+import { ClearMessage, ReceiveMessage } from "@topic/lib/window-message";
 import Standby from "@topic/lib/standby";
 import { ActionFrameStatusStatus } from "@topic/lib/types";
 
@@ -26,7 +30,7 @@ export default async function RunningTopicListReply(
     const init = InitRunningTopicListReply();
     if (init) {
       addLogItem("开始：批量回复讨论");
-      Standby(0.1);
+      await Standby(0.3);
       setActionFrameStatusStatus("waitingToStart");
     }
   }
@@ -36,11 +40,11 @@ export default async function RunningTopicListReply(
       const src = topicList[index].url;
       if (src) {
         const srcHashed = AppendHashAction(src).toString();
-        setActionFrameStatusSrc(srcHashed);
+        const srcIndexed = AppendHashActionIndex(index, srcHashed).toString();
+        setActionFrameStatusSrc(srcIndexed);
         addLogItem(`正在回复讨论：${topicList[index].title}`);
-        Standby(0.1);
+        await Standby(0.5);
         ReceiveMessage();
-        Standby(0.3);
         setActionFrameStatusStatus("running");
       } else {
         MakeError("未找到讨论链接");
@@ -53,7 +57,7 @@ export default async function RunningTopicListReply(
     if (status === "success") {
       const title = topicList[index].title;
       addLogItem(`已回复讨论：${title}`);
-      Standby(0.4);
+      await Standby(1);
       setActionFrameStatusStatus("waitingToNext");
     }
     const total = actionFrameStatusTotal || 0;
@@ -81,12 +85,13 @@ export const PrepareNextRunningTopicListReply = async (
   index: number,
   total: number,
 ) => {
+  addLogItem("等待继续...");
   setActionFrameStatusSrc("");
+  await Standby(0.5);
   if (index === total - 1) {
     return true;
   } else {
     setActionFrameStatusIndex(index + 1);
-    Standby(0.5);
     setActionFrameStatusStatus("waitingToStart");
     return false;
   }

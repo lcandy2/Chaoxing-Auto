@@ -42,9 +42,6 @@ export default function useCurrentStatus({
         setIsButtonDisabled(false);
         const hashAction = GetHashAction();
         const hashStart = GetHashStart() || hashAction;
-        if (hashAction) {
-          setIsInActionFrame(true);
-        }
         if (hashStart) {
           setCurrentStatus("triggered");
         }

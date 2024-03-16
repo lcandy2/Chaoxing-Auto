@@ -6,6 +6,7 @@ import { useLogStore, useStatusStore } from "@topic/lib/store";
 import {
   AppendHashSuccess,
   GetHashAction,
+  GetHashIndex,
   GetHashStart,
   GetHashSuccess,
 } from "@topic/lib/hash";
@@ -33,9 +34,11 @@ export default function PanelActions() {
   const actionFrameStatusStatus = actionFrameStatus.status;
 
   useEffect(() => {
-    const hashSuccess = GetHashSuccess();
-    if (hashSuccess) {
+    if (GetHashSuccess()) {
       setCurrentStatus("success");
+    }
+    if (GetHashAction()) {
+      setIsInActionFrame(true);
     }
     if (DetailMatch()) {
       setCurrentPage("detail");
@@ -50,6 +53,8 @@ export default function PanelActions() {
       if (topicDetail) {
         if (
           topicDetail.replies &&
+          topicDetail.replies[0] &&
+          topicDetail.replies[0].content &&
           topicDetail.replies[0].content === "NEED_OBSERVE"
         ) {
           console.debug("NEED_OBSERVE");
@@ -120,7 +125,7 @@ export default function PanelActions() {
   useEffect(() => {
     if (isInActionFrame && currentStatus === "success") {
       console.debug("PostMessageSuccess");
-      PostMessageSuccess();
+      PostMessageSuccess(GetHashIndex() || 0);
     }
   }, [isInActionFrame, currentStatus]);
 
