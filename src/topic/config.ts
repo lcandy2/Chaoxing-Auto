@@ -30,3 +30,13 @@ export const LEGACY_DETAIL_ACTION_BUTTON_TO_REPLY =
 export const LEGACY_DETAIL_ACTION_TEXTAREA = "div.plDiv div.hfpl textarea";
 export const LEGACY_DETAIL_ACTION_BUTTON_TO_SUBMIT =
   "div.plDiv div.hfpl input.grenBtn";
+
+export const NEW_LIST_ACTION_NEW_TOPIC_BUTTON = "div.bnt_group a.jb_btn";
+export const NEW_LIST_ACTION_NEW_TOPIC_TITLE_INPUT =
+  "div.edit_main div.edit_title input";
+export const NEW_LIST_ACTION_NEW_TOPIC_SUBMIT =
+  "div.edit_main div.edit_btn div.jb_btn";
+export const LEGACY_LIST_ACTION_NEW_TOPIC_BUTTON = "div.operations a.addTopics";
+export const LEGACY_LIST_ACTION_NEW_TOPIC_TITLE_INPUT =
+  "form#addGroupTopicForm input#c_title";
+export const LEGACY_LIST_ACTION_NEW_TOPIC_SUBMIT = "div.listBtn a.qdBtn";

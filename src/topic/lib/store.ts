@@ -4,6 +4,7 @@ import GMStorage from "@topic/lib/hooks/gm-storage";
 import {
   ActionFrameStatus,
   ActionFrameStatusStatus,
+  ActionNewTopicStatus,
   CurrentPage,
   CurrentStatus,
   TopicDetail,
@@ -27,16 +28,20 @@ export const useSettingsStore = create(
   persist(
     combine(
       {
-        standbyTime: <number>200,
-        countTimes: <number>1,
+        standbyTime: <number>1000,
+        replyCountTimes: <number>1,
+        newTopicCountTimes: <number>3,
         _hasHydrated: <boolean>false,
       },
       (set) => ({
         setStandbyTime: (time: number) => {
           set({ standbyTime: time });
         },
-        setCountTimes: (times: number) => {
-          set({ countTimes: times });
+        setReplyCountTimes: (times: number) => {
+          set({ replyCountTimes: times });
+        },
+        setNewTopicCountTimes: (times: number) => {
+          set({ newTopicCountTimes: times });
         },
         setHasHydrated: (state: boolean) => {
           set({
@@ -64,6 +69,7 @@ export const useStatusStore = create(
       currentPage: <CurrentPage>null,
       isInActionFrame: <boolean>false,
       actionFrameStatus: <ActionFrameStatus>{},
+      actionNewTopicStatus: <ActionNewTopicStatus>null,
       topicDetail: <TopicDetail>{},
       topicList: <TopicList[]>[],
     },
@@ -113,6 +119,9 @@ export const useStatusStore = create(
             src,
           },
         }));
+      },
+      setActionNewTopicStatus: (actionNewTopicStatus: ActionNewTopicStatus) => {
+        set({ actionNewTopicStatus });
       },
       setTopicDetail: (topicDetail: TopicDetail) => {
         set({ topicDetail });

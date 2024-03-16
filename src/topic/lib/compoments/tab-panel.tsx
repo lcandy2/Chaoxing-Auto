@@ -60,26 +60,32 @@ export default function TabPanel() {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={tab}
-          onChange={handleChange}
-          aria-label="basic tabs example"
-        >
-          <Tab disabled={isInActionFrame} label="状态" {...a11yProps(0)} />
-          <Tab disabled={isInActionFrame} label="设定" {...a11yProps(1)} />
-          <Tab disabled={isInActionFrame} label="关于" {...a11yProps(2)} />
-        </Tabs>
-      </Box>
+      {!isInActionFrame && (
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs
+            value={tab}
+            onChange={handleChange}
+            aria-label="basic tabs example"
+          >
+            <Tab disabled={isInActionFrame} label="状态" {...a11yProps(0)} />
+            <Tab disabled={isInActionFrame} label="设定" {...a11yProps(1)} />
+            <Tab disabled={isInActionFrame} label="关于" {...a11yProps(2)} />
+          </Tabs>
+        </Box>
+      )}
       <CustomTabPanel value={tab} index={0}>
         <Status />
       </CustomTabPanel>
-      <CustomTabPanel value={tab} index={1}>
-        <Settings />
-      </CustomTabPanel>
-      <CustomTabPanel value={tab} index={2}>
-        <About />
-      </CustomTabPanel>
+      {!isInActionFrame && (
+        <>
+          <CustomTabPanel value={tab} index={1}>
+            <Settings />
+          </CustomTabPanel>
+          <CustomTabPanel value={tab} index={2}>
+            <About />
+          </CustomTabPanel>
+        </>
+      )}
     </Box>
   );
 }

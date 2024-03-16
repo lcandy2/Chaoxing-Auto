@@ -28,9 +28,9 @@ const isNewVersion = currentVersion === "new";
 const addLogItem = useLogStore.getState().addLogItem;
 
 export default async function RunningTopicDetailReply() {
-  const { countTimes } = useSettingsStore.getState();
+  const { replyCountTimes } = useSettingsStore.getState();
   const { topicDetail } = useStatusStore.getState();
-  const contextToReply = getRandomReplies(topicDetail, countTimes);
+  const contextToReply = getRandomReplies(topicDetail, replyCountTimes);
   console.debug("currentVersion", currentVersion);
 
   try {
@@ -77,7 +77,7 @@ const getRandomReplies = (
   const contents = topicDetail.replies.map((reply) => reply.content || "");
   const randomContents: string[] = [];
 
-  if (contents.length <= count) {
+  if (contents.length <= 0) {
     for (let i = 0; i < count; i++) {
       randomContents.push(topicDetail.content || topicDetail.title || "");
     }

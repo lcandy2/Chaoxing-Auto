@@ -1,11 +1,11 @@
 import { useLogStore, useStatusStore } from "@topic/lib/store";
 import {
-  AppendHashAction,
-  AppendHashActionIndex,
+  AppendHashActionTrigger,
+  AppendHashActionReplyIndex,
   AppendHashStart,
 } from "@topic/lib/hash";
 import MakeError from "@topic/lib/make-error";
-import { ClearMessage, ReceiveMessage } from "@topic/lib/window-message";
+import { ReceiveMessage } from "@topic/lib/window-message";
 import Standby from "@topic/lib/standby";
 import { ActionFrameStatusStatus } from "@topic/lib/types";
 
@@ -39,8 +39,11 @@ export default async function RunningTopicListReply(
     if (status === "waitingToStart") {
       const src = topicList[index].url;
       if (src) {
-        const srcHashed = AppendHashAction(src).toString();
-        const srcIndexed = AppendHashActionIndex(index, srcHashed).toString();
+        const srcHashed = AppendHashActionTrigger(src).toString();
+        const srcIndexed = AppendHashActionReplyIndex(
+          index,
+          srcHashed,
+        ).toString();
         setActionFrameStatusSrc(srcIndexed);
         addLogItem(`正在回复讨论：${topicList[index].title}`);
         await Standby(0.5);

@@ -40,9 +40,22 @@ export type ActionFrameStatusStatus =
   | "waitingToNext"
   | "finished";
 
+export type ActionNewTopicStatus =
+  | "idle"
+  | "triggered"
+  | "waitingToStart"
+  | "running"
+  | "success"
+  | "failed"
+  | "waitingToNext"
+  | "finished"
+  | null;
+
 export interface ActionFrameStatus {
   index?: number;
   total?: number;
   src?: string;
   status?: ActionFrameStatusStatus;
 }
+
+export type SuccessType = "newTopic" | "multiReply" | "singleReply";

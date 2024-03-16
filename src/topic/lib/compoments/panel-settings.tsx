@@ -3,8 +3,9 @@ import NumberInput from "@topic/lib/compoments/number-input";
 import { useSettingsStore } from "@topic/lib/store";
 
 export default function Settings() {
-  const { countTimes, standbyTime, setCountTimes, setStandbyTime } =
-    useSettingsStore();
+  const { standbyTime, setStandbyTime } = useSettingsStore();
+  const { replyCountTimes, setReplyCountTimes } = useSettingsStore();
+  const { newTopicCountTimes, setNewTopicCountTimes } = useSettingsStore();
   const hasHydrated = useSettingsStore((state) => state._hasHydrated);
 
   if (!hasHydrated) {
@@ -18,12 +19,23 @@ export default function Settings() {
           label="评论数量"
           min={1}
           max={10}
-          value={countTimes}
-          onChange={setCountTimes}
+          value={replyCountTimes}
+          onChange={setReplyCountTimes}
           size="small"
           style={{ width: 130 }}
         />
       </ListItem>
+      {/*<ListItem sx={{ pt: 3 }}>*/}
+      {/*  <NumberInput*/}
+      {/*    label="发起讨论数量"*/}
+      {/*    min={1}*/}
+      {/*    max={10}*/}
+      {/*    value={newTopicCountTimes}*/}
+      {/*    onChange={setNewTopicCountTimes}*/}
+      {/*    size="small"*/}
+      {/*    style={{ width: 130 }}*/}
+      {/*  />*/}
+      {/*</ListItem>*/}
       <ListItem sx={{ pt: 3 }}>
         <NumberInput
           label="间隔时间（ms）"

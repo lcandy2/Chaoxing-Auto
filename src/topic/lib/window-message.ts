@@ -26,7 +26,3 @@ export const ReceiveMessage = () => {
     }
   });
 };
-
-export const ClearMessage = () => {
-  window.removeEventListener("message", () => {});
-};

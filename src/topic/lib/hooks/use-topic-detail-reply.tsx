@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import RunningTopicDetailReply from "@topic/lib/running-topic-detail-reply";
 import {
   AppendHashSuccess,
-  GetHashAction,
+  GetHashActionTrigger,
   GetHashStart,
 } from "@topic/lib/hash";
 import { CurrentStatus, TopicDetail } from "@topic/lib/types";
