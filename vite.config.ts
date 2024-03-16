@@ -13,7 +13,8 @@ export default defineConfig({
     monkey({
       entry: "src/main.tsx",
       userscript: {
-        namespace: "lcandy2/chaoxing-auto",
+        namespace: "https://github.com/lcandy2/Chaoxing-Auto",
+        source: "https://github.com/lcandy2/user.js",
         match: [
           // Topic
           matchUrl(TopicConfig.LEGACY_LIST), // Legacy List
@@ -23,6 +24,7 @@ export default defineConfig({
           matchUrl(TopicConfig.NEW_LIST), // New List
           matchUrl(TopicConfig.NEW_DETAIL), // New Detail
         ],
+        license: "None",
       },
       build: {
         externalGlobals: {
