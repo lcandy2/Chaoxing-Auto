@@ -57,7 +57,7 @@ export default async function RunningTopicDetailReply() {
     });
 
     if (actionButtonToReply && actionTextAreaToReply && actionButtonToSubmit) {
-      AppendHashSuccess();
+      // AppendHashSuccess();
       return true;
     }
   } catch (error) {
@@ -154,7 +154,7 @@ const ActionButtonToSubmit = async ({
       textarea.value = contextToReply[i];
       addLogItem(`Reply ${contextToReply[i]} filled, waiting to submit...`);
       if (currentVersion === "legacy") {
-        AppendHashSuccess();
+        // AppendHashSuccess();
         element.addEventListener("click", function (event) {
           event.preventDefault();
         });
@@ -168,7 +168,6 @@ const ActionButtonToSubmit = async ({
       await Standby(1);
       addLogItem(`Reply submitted, waiting to continue...`);
     }
-    addLogItem(`All Done!`);
     return true;
   } catch (error) {
     MakeError(error);

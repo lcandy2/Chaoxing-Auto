@@ -44,7 +44,7 @@ const GetLegacyItems = (): TopicList[] => {
       const detailElement = item.querySelector("p.clearfix");
       const author = detailElement?.children[0].textContent?.trim() || "";
       const replyCount = detailElement?.children[1].textContent?.trim() || "";
-      const url = host + titleElement?.getAttribute("href") || "";
+      const url = titleElement?.getAttribute("href") || "";
       return { title, author, replyCount, url };
     });
   return result;

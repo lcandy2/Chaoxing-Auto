@@ -29,3 +29,20 @@ export interface TopicList {
   replyCount?: string;
   url?: string;
 }
+
+export type ActionFrameStatusStatus =
+  | "idle"
+  | "triggered"
+  | "waitingToStart"
+  | "running"
+  | "success"
+  | "failed"
+  | "waitingToNext"
+  | "finished";
+
+export interface ActionFrameStatus {
+  index?: number;
+  total?: number;
+  src?: string;
+  status?: ActionFrameStatusStatus;
+}

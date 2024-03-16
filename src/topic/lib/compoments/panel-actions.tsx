@@ -3,9 +3,18 @@ import { useEffect, useState } from "react";
 import GetTopicDetail from "@topic/lib/get-topic-detail";
 import { DetailMatch, ListMatch } from "@topic/match";
 import { useLogStore, useStatusStore } from "@topic/lib/store";
-import RunningTopicDetailReply from "@topic/lib/running-topic-detail-reply";
-import { GetHashAction, GetHashStart, GetHashSuccess } from "@topic/lib/hash";
+import {
+  AppendHashSuccess,
+  GetHashAction,
+  GetHashStart,
+  GetHashSuccess,
+} from "@topic/lib/hash";
 import GetTopicList from "@topic/lib/get-topic-list";
+import useTopicDetailReply, {
+  handleRunningTopicDetailStart,
+} from "@topic/lib/hooks/use-topic-detail-reply";
+import RunningTopicListReply from "@topic/lib/running-topic-list-reply";
+import { PostMessageSuccess } from "@topic/lib/window-message";
 
 export default function PanelActions() {
   const { currentPage, setCurrentPage } = useStatusStore();
@@ -13,9 +22,14 @@ export default function PanelActions() {
   const { topicList, setTopicList } = useStatusStore();
   const { currentStatus, setCurrentStatus } = useStatusStore();
   const { isInActionFrame, setIsInActionFrame } = useStatusStore();
-  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
   const { addLogItem } = useLogStore();
-  const [runningListIndex, setRunningListIndex] = useState<number | null>(null);
+  const {
+    actionFrameStatus,
+    setActionFrameStatus,
+    setActionFrameStatusStatus,
+  } = useStatusStore();
+  const actionFrameStatusStatus = actionFrameStatus.status;
 
   useEffect(() => {
     const hashSuccess = GetHashSuccess();
@@ -25,7 +39,6 @@ export default function PanelActions() {
       setCurrentPage("detail");
       if (hashAction) setIsInActionFrame(true);
       if (hashStart) {
-        console.log("HashStart");
         if (!hashSuccess) {
           setCurrentStatus("triggered");
         }
@@ -47,6 +60,7 @@ export default function PanelActions() {
           const topicDetail = GetTopicDetail();
           if (topicDetail) {
             setTopicDetail(topicDetail);
+            if (!currentStatus) setCurrentStatus("idle");
           }
           break;
         case "list":
@@ -54,6 +68,8 @@ export default function PanelActions() {
           const topicList = GetTopicList();
           if (topicList) {
             setTopicList(topicList);
+            if (!actionFrameStatusStatus && !currentStatus)
+              setActionFrameStatusStatus("idle");
           }
           break;
         default:
@@ -64,19 +80,14 @@ export default function PanelActions() {
     }
   }, [currentPage]);
 
-  useEffect(() => {
-    if (topicDetail) {
-      if (topicDetail.title) {
-        addLogItem(`获取到讨论标题：${topicDetail.title}`);
-      }
-      if (topicDetail.content) {
-        addLogItem(`获取到讨论内容：${topicDetail.content}`);
-      }
-      if (topicDetail.replies) {
-        addLogItem(`获取到讨论回复：共 ${topicDetail.replies.length} 条`);
-      }
-    }
-  }, [topicDetail]);
+  useTopicDetailReply({
+    topicDetail,
+    setCurrentStatus,
+    currentStatus,
+    setIsButtonDisabled,
+  });
+  const handleRunningTopicDetailReplyButtonClick =
+    handleRunningTopicDetailStart({ setCurrentStatus });
 
   useEffect(() => {
     if (topicList.length) {
@@ -85,38 +96,51 @@ export default function PanelActions() {
   }, [topicList]);
 
   useEffect(() => {
-    const handleRunningTopicReply = async () => {
-      const result = await RunningTopicDetailReply();
-      if (result) {
-        setCurrentStatus("success");
-      } else {
-        setCurrentStatus("failed");
+    if (isInActionFrame && currentStatus === "success") {
+      console.debug("PostMessageSuccess");
+      PostMessageSuccess();
+    }
+  }, [isInActionFrame]);
+
+  const handleRunningTopicListReplyButtonClick = async () => {
+    setActionFrameStatusStatus("triggered");
+  };
+
+  useEffect(() => {
+    const status = actionFrameStatusStatus;
+    status &&
+      console.debug(
+        "PanelActions useEffect actionFrameStatus",
+        actionFrameStatus,
+      );
+    const handleRunningTopicListReply = async () => {
+      if (status) {
+        const result = await RunningTopicListReply(status);
+        if (result) {
+          setActionFrameStatusStatus("finished");
+        }
       }
     };
-
-    switch (currentStatus) {
-      case "running":
-        setIsButtonDisabled(true);
-        break;
-      case "triggered":
-        setIsButtonDisabled(true);
-        setCurrentStatus("running");
-        handleRunningTopicReply();
-        break;
-      default:
-        setIsButtonDisabled(false);
-        break;
+    if (
+      status === "triggered" ||
+      status === "waitingToStart" ||
+      status === "waitingToNext" ||
+      status === "failed" ||
+      status === "success"
+    ) {
+      handleRunningTopicListReply();
+      setCurrentStatus("running");
+    } else if (status === "finished") {
+      setCurrentStatus("success");
+    } else if (status === "idle") {
+      setCurrentStatus("idle");
     }
-  }, [currentStatus]);
-
-  const handleRunningButtonClick = async () => {
-    setCurrentStatus("triggered");
-  };
+  }, [actionFrameStatusStatus]);
 
   return (
     <>
       {isButtonDisabled && <CircularProgress size="2em" />}
-      {currentStatus === "success" && (
+      {currentStatus === "success" && currentPage === "detail" && (
         <>
           <Icon color="success">done</Icon>
           <Typography variant="body2">已完成</Typography>
@@ -132,7 +156,7 @@ export default function PanelActions() {
         <Button
           autoFocus={currentStatus !== "success"}
           disabled={isButtonDisabled}
-          onClick={handleRunningButtonClick}
+          onClick={handleRunningTopicDetailReplyButtonClick}
         >
           {(currentStatus === "success" || currentStatus === "failed") &&
             "再次"}
@@ -140,9 +164,22 @@ export default function PanelActions() {
         </Button>
       )}
       {currentPage === "list" && (
-        <Button autoFocus disabled>
-          暂不支持
-        </Button>
+        <>
+          <Button autoFocus disabled>
+            批量发起讨论
+          </Button>
+
+          <Button
+            autoFocus={currentStatus !== "success"}
+            disabled={isButtonDisabled}
+            onClick={handleRunningTopicListReplyButtonClick}
+          >
+            {currentStatus === "success" && <Icon color="success">done</Icon>}
+            {currentStatus === "success" || currentStatus === "failed"
+              ? "再次批量回复"
+              : "批量回复讨论"}
+          </Button>
+        </>
       )}
     </>
   );

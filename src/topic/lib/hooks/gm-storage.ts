@@ -4,15 +4,15 @@ import { StateStorage } from "zustand/middleware";
 
 const GMStorage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
-    console.debug(name, "has been retrieved");
+    // console.debug(name, "has been retrieved");
     return (await GM_getValue(name)) || null;
   },
   setItem: async (name: string, value: string): Promise<void> => {
-    console.debug(name, "with value", value, "has been saved");
+    // console.debug(name, "with value", value, "has been saved");
     await GM_setValue(name, value);
   },
   removeItem: async (name: string): Promise<void> => {
-    console.debug(name, "has been deleted");
+    // console.debug(name, "has been deleted");
     await GM_deleteValue(name);
   },
 };

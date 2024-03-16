@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { combine, createJSONStorage, persist } from "zustand/middleware";
 import GMStorage from "@topic/lib/hooks/gm-storage";
 import {
+  ActionFrameStatus,
+  ActionFrameStatusStatus,
   CurrentPage,
   CurrentStatus,
   TopicDetail,
@@ -61,7 +63,7 @@ export const useStatusStore = create(
       currentStatus: <CurrentStatus>null,
       currentPage: <CurrentPage>null,
       isInActionFrame: <boolean>false,
-      actionSrc: <string>"",
+      actionFrameStatus: <ActionFrameStatus>{},
       topicDetail: <TopicDetail>{},
       topicList: <TopicList[]>[],
     },
@@ -75,8 +77,42 @@ export const useStatusStore = create(
       setIsInActionFrame: (isInActionFrame: boolean) => {
         set({ isInActionFrame });
       },
-      setActionSrc: (actionSrc: string) => {
-        set({ actionSrc });
+      setActionFrameStatus: (actionFrameStatus: ActionFrameStatus) => {
+        set({ actionFrameStatus });
+      },
+      setActionFrameStatusStatus: (
+        actionFrameStatusStatus: ActionFrameStatusStatus,
+      ) => {
+        set((state) => ({
+          actionFrameStatus: {
+            ...state.actionFrameStatus,
+            status: actionFrameStatusStatus,
+          },
+        }));
+      },
+      setActionFrameStatusIndex: (index: number) => {
+        set((state) => ({
+          actionFrameStatus: {
+            ...state.actionFrameStatus,
+            index,
+          },
+        }));
+      },
+      setActionFrameStatusTotal: (total: number) => {
+        set((state) => ({
+          actionFrameStatus: {
+            ...state.actionFrameStatus,
+            total,
+          },
+        }));
+      },
+      setActionFrameStatusSrc: (src: string) => {
+        set((state) => ({
+          actionFrameStatus: {
+            ...state.actionFrameStatus,
+            src,
+          },
+        }));
       },
       setTopicDetail: (topicDetail: TopicDetail) => {
         set({ topicDetail });

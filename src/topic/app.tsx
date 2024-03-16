@@ -9,8 +9,13 @@ import React, { useState } from "react";
 export default function App() {
   const [open, setOpen] = useState(true);
   const nodeRef = React.useRef(null);
-  const { isInActionFrame, actionSrc, setCurrentStatus, setCurrentPage } =
-    useStatusStore();
+  const {
+    isInActionFrame,
+    actionFrameStatus,
+    setCurrentStatus,
+    setCurrentPage,
+  } = useStatusStore();
+  const actionSrc = actionFrameStatus.src;
 
   const handleClose = () => {
     setOpen(false);
@@ -36,7 +41,13 @@ export default function App() {
             draggableProps={{ positionOffset: { x: "300px", y: "30px" } }}
             maxWidth="sm"
           >
-            <iframe src={actionSrc} width="600" height="460" />
+            <iframe
+              id="cxauto_action"
+              src={actionSrc}
+              width="600"
+              height="460"
+            />
+            <div id="cxauto_action" />
           </DraggableFloatingDialog>
         )}
       </>
