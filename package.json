@@ -33,6 +33,6 @@
     "vite-plugin-monkey": "^3.5.1"
   },
   "lint-staged": {
-    "**/*": "prettier --write --ignore-unknown"
+    "**/*": "prettier . --write --ignore-unknown"
   }
 }
