@@ -18,7 +18,8 @@ export default defineConfig({
           "超兴学习通自动化脚本，能自动完成讨论，具备自动完成讨论任务、一键回复指定话题、批量回复和创建话题等功能，让讨论任务变得轻松简单。",
         namespace: "https://github.com/lcandy2/Chaoxing-Auto",
         homepage: "https://greasyfork.org/scripts/489933",
-        source: "https://github.com/lcandy2/user.js",
+        source: "https://github.com/lcandy2/Chaoxing-Auto",
+        homepageURL: "https://github.com/lcandy2/user.js/tree/main/chaoxing.com",
         match: [
           // Topic
           matchUrl(TopicConfig.LEGACY_LIST), // Legacy List
